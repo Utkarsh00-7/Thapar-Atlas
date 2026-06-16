@@ -1,0 +1,55 @@
+/* ==========================================================================
+   Card Component Styles
+   ========================================================================== */
+
+.card {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition:
+    box-shadow var(--duration-normal) var(--ease-default),
+    border-color var(--duration-normal) var(--ease-default),
+    transform var(--duration-normal) var(--ease-default);
+}
+
+/* --- Padding Sizes --- */
+.card--padding-sm { padding: var(--space-3); }
+.card--padding-md { padding: var(--space-4); }
+.card--padding-lg { padding: var(--space-6); }
+.card--padding-none { padding: 0; }
+
+/* --- Variants --- */
+
+/* Default — flat with subtle border */
+.card--default {
+  box-shadow: var(--shadow-xs);
+}
+
+/* Elevated — more prominent shadow */
+.card--elevated {
+  box-shadow: var(--shadow-md);
+  border-color: transparent;
+}
+
+/* Interactive — responds to hover */
+.card--interactive {
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.card--interactive:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.card--interactive:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.card--interactive:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+

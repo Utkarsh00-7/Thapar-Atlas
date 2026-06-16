@@ -1,0 +1,115 @@
+/* ==========================================================================
+   Modal Component Styles
+   ========================================================================== */
+
+/* --- Overlay / Backdrop --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: var(--bg-overlay);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: modal-backdrop-in var(--duration-fast) var(--ease-out) both;
+}
+
+@keyframes modal-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* --- Modal Panel --- */
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100dvh - var(--space-8));
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: scale-in var(--duration-normal) var(--ease-spring) both;
+}
+
+/* Size variants */
+.modal--sm { max-width: 380px; }
+.modal--md { max-width: 480px; }
+.modal--lg { max-width: 640px; }
+
+/* --- Header --- */
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: var(--leading-tight);
+}
+
+/* --- Close Button --- */
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  transition:
+    background-color var(--duration-micro) var(--ease-default),
+    color var(--duration-micro) var(--ease-default);
+  flex-shrink: 0;
+}
+
+.modal__close:hover {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.modal__close:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.modal__close svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* --- Body --- */
+.modal__body {
+  padding: var(--space-5);
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* --- Footer --- */
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+

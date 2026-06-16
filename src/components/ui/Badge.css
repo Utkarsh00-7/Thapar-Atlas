@@ -1,0 +1,69 @@
+/* ==========================================================================
+   Badge Component Styles
+   ========================================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-body);
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: var(--radius-full);
+  line-height: 1;
+  user-select: none;
+}
+
+/* --- Sizes --- */
+.badge--sm {
+  padding: 2px 8px;
+  font-size: var(--text-xs);
+  height: 20px;
+}
+
+.badge--md {
+  padding: 4px 10px;
+  font-size: var(--text-sm);
+  height: 24px;
+}
+
+/* --- Variants --- */
+
+.badge--default {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.badge--accent {
+  background-color: var(--accent-subtle);
+  color: var(--accent-text);
+}
+
+.badge--success {
+  background-color: var(--success-subtle);
+  color: var(--success);
+}
+
+.badge--warning {
+  background-color: var(--warning-subtle);
+  color: var(--warning);
+}
+
+[data-theme='dark'] .badge--warning {
+  color: #A16207;
+}
+
+.badge--danger {
+  background-color: var(--danger-subtle);
+  color: var(--danger);
+}
+
+/* --- Badge with dot indicator --- */
+.badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+  flex-shrink: 0;
+}
+

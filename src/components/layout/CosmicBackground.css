@@ -1,0 +1,9 @@
+.global-3d-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* Render above solid mesh gradient at -2, but below page content */
+  pointer-events: none;
+  background: transparent;
+}

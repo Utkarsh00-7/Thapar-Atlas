@@ -1,0 +1,32 @@
+/* ==========================================================================
+   Skeleton Component Styles
+   ========================================================================== */
+
+.skeleton {
+  background-color: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  animation: skeleton-pulse 1.8s var(--ease-default) infinite;
+}
+
+/* --- Variants --- */
+.skeleton--text {
+  height: 14px;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton--block {
+  /* width and height set via inline style */
+  border-radius: var(--radius-md);
+}
+
+.skeleton--circle {
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* --- Common widths for text skeletons --- */
+.skeleton--full  { width: 100%; }
+.skeleton--three-quarter { width: 75%; }
+.skeleton--half  { width: 50%; }
+.skeleton--third { width: 33%; }
+

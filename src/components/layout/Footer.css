@@ -1,0 +1,101 @@
+/* ─── Footer ─────────────────────────────────────────── */
+
+.footer {
+  border-top: 1px solid var(--color-border);
+  background: transparent; /* Transparent so the 3D starfield extends all the way to the bottom */
+}
+
+.footer__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-10) var(--space-5) var(--space-6);
+}
+
+/* ─── Columns Grid ───────────────────────────────────── */
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-8);
+}
+
+@media (min-width: 640px) {
+  .footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .footer__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ─── Column ─────────────────────────────────────────── */
+
+.footer__col-title {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.footer__col-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.footer__col-links a {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+              color 0.2s ease;
+  padding: var(--space-1) 0;
+}
+
+.footer__col-links a:hover {
+  color: var(--color-accent);
+  transform: translateX(4px); /* Subtle shift to the right */
+}
+
+/* About column */
+
+.footer__about {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-text-tertiary);
+  max-width: 280px;
+}
+
+/* ─── Bottom Bar ─────────────────────────────────────── */
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer__copy {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.footer__heart {
+  color: var(--color-accent);
+  font-size: 0.85rem;
+}

@@ -1,0 +1,622 @@
+/* ═══════════════════════════════════════════════════════════════
+   CAMPUS MAP — Styles
+   Follows the cosmic glassmorphic dark theme
+   ═══════════════════════════════════════════════════════════════ */
+
+.campus-page {
+  min-height: calc(100vh - 68px);
+  padding: var(--space-8) 0 var(--space-20);
+  background: transparent;
+  animation: campusFadeIn 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.campus-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+}
+
+/* ─── Header ─── */
+.campus-header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.campus-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.campus-compass-icon {
+  color: var(--color-accent);
+}
+
+.campus-header h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.campus-header p {
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Category Filter Bar ─── */
+.campus-categories {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-8);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-4);
+}
+
+.campus-cat-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px var(--space-5);
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.campus-cat-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.campus-cat-btn.active {
+  background: rgba(34, 211, 238, 0.08);
+  color: var(--color-accent);
+  border-color: rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.1);
+}
+
+/* ─── Grid Layout ─── */
+.campus-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .campus-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Sidebar Panel ─── */
+.campus-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 520px;
+  overflow: hidden;
+}
+
+.campus-search-wrap {
+  position: relative;
+  margin-bottom: var(--space-4);
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-secondary);
+}
+
+.campus-search-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: rgba(10, 10, 15, 0.5);
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.campus-search-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.15);
+}
+
+.campus-locations-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 4px;
+}
+
+.campus-loc-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--color-text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.campus-loc-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.campus-loc-item.active {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.05);
+}
+
+.loc-bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.loc-bullet.academic { background-color: var(--color-accent); }
+.loc-bullet.hostel { background-color: #8B5CF6; }
+.loc-bullet.food { background-color: var(--color-accent-secondary); }
+.loc-bullet.amenities { background-color: var(--color-success); }
+
+.loc-item-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loc-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.loc-code {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.empty-search-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  color: var(--color-text-secondary);
+  font-size: 0.95rem;
+}
+
+/* ─── Map Viewer Canvas ─── */
+.campus-map-card {
+  position: relative;
+  height: 600px;
+  overflow: hidden;
+  padding: 0 !important;
+  background: rgba(8, 8, 12, 0.65) !important;
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+}
+
+.map-view-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
+.map-view-controls button {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.map-view-controls button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.zoom-indicator {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+.map-canvas-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+  user-select: none;
+}
+
+.map-canvas-container:active {
+  cursor: grabbing;
+}
+
+.map-canvas {
+  width: 1000px;
+  height: 625px; /* 16:10 Landscape Aspect Ratio */
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: radial-gradient(circle at center, rgba(34, 211, 238, 0.02) 0%, transparent 80%);
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-origin: 0 0;
+}
+
+.map-blueprint-svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* ─── Vector Building Replica Styles ─── */
+.map-building-group {
+  cursor: pointer;
+}
+
+.building-shape {
+  fill: rgba(255, 255, 255, 0.025);
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 0.25px;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Academic Outlines */
+.map-building-group.academic .building-shape {
+  fill: rgba(34, 211, 238, 0.01);
+  stroke: rgba(34, 211, 238, 0.25);
+}
+.map-building-group.academic:hover .building-shape {
+  fill: rgba(34, 211, 238, 0.08);
+  stroke: rgba(34, 211, 238, 0.75);
+  filter: drop-shadow(0 0 1.5px rgba(34, 211, 238, 0.5));
+}
+.map-building-group.academic.active .building-shape {
+  fill: rgba(34, 211, 238, 0.15);
+  stroke: rgba(34, 211, 238, 1);
+  stroke-width: 0.45px;
+  filter: drop-shadow(0 0 3px rgba(34, 211, 238, 0.7));
+}
+
+/* Hostels Outlines */
+.map-building-group.hostel .building-shape {
+  fill: rgba(139, 92, 246, 0.01);
+  stroke: rgba(139, 92, 246, 0.25);
+}
+.map-building-group.hostel:hover .building-shape {
+  fill: rgba(139, 92, 246, 0.08);
+  stroke: rgba(139, 92, 246, 0.75);
+  filter: drop-shadow(0 0 1.5px rgba(139, 92, 246, 0.5));
+}
+.map-building-group.hostel.active .building-shape {
+  fill: rgba(139, 92, 246, 0.15);
+  stroke: rgba(139, 92, 246, 1);
+  stroke-width: 0.45px;
+  filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.7));
+}
+
+/* Food Outlines */
+.map-building-group.food .building-shape {
+  fill: rgba(245, 158, 11, 0.01);
+  stroke: rgba(245, 158, 11, 0.25);
+}
+.map-building-group.food:hover .building-shape {
+  fill: rgba(245, 158, 11, 0.08);
+  stroke: rgba(245, 158, 11, 0.75);
+  filter: drop-shadow(0 0 1.5px rgba(245, 158, 11, 0.5));
+}
+.map-building-group.food.active .building-shape {
+  fill: rgba(245, 158, 11, 0.15);
+  stroke: rgba(245, 158, 11, 1);
+  stroke-width: 0.45px;
+  filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.7));
+}
+
+/* Amenities Outlines */
+.map-building-group.amenities .building-shape {
+  fill: rgba(34, 197, 94, 0.01);
+  stroke: rgba(34, 197, 94, 0.25);
+}
+.map-building-group.amenities:hover .building-shape {
+  fill: rgba(34, 197, 94, 0.08);
+  stroke: rgba(34, 197, 94, 0.75);
+  filter: drop-shadow(0 0 1.5px rgba(34, 197, 94, 0.5));
+}
+.map-building-group.amenities.active .building-shape {
+  fill: rgba(34, 197, 94, 0.15);
+  stroke: rgba(34, 197, 94, 1);
+  stroke-width: 0.45px;
+  filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.7));
+}
+
+/* Text labels on map */
+.building-text {
+  font-family: var(--font-body);
+  font-size: 0.65px;
+  font-weight: 700;
+  fill: var(--color-text-secondary);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.55;
+  transition: opacity 0.25s ease, fill 0.25s ease;
+}
+
+.map-building-group:hover .building-text,
+.map-building-group.active .building-text {
+  opacity: 1;
+  fill: var(--color-text-primary);
+}
+
+/* Gate Marker styling */
+.map-gate-marker text {
+  font-family: var(--font-heading);
+  font-size: 0.8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+
+/* ─── Node Pins ─── */
+.map-node-pin {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  transform: translate(-50%, -50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; /* Let click pass through directly to custom SVG path */
+}
+
+.pin-marker {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 1px solid #FFF;
+  z-index: 2;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pin-pulse {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(34, 211, 238, 0.25);
+  transform: scale(0.4);
+  opacity: 0;
+  transition: all 0.25s ease;
+  z-index: 1;
+}
+
+/* Color codes */
+.map-node-pin.academic .pin-marker { background-color: var(--color-accent); }
+.map-node-pin.academic .pin-pulse { background-color: rgba(34, 211, 238, 0.25); }
+
+.map-node-pin.hostel .pin-marker { background-color: #8B5CF6; }
+.map-node-pin.hostel .pin-pulse { background-color: rgba(139, 92, 246, 0.25); }
+
+.map-node-pin.food .pin-marker { background-color: var(--color-accent-secondary); }
+.map-node-pin.food .pin-pulse { background-color: rgba(245, 158, 11, 0.25); }
+
+.map-node-pin.amenities .pin-marker { background-color: var(--color-success); }
+.map-node-pin.amenities .pin-pulse { background-color: rgba(34, 197, 94, 0.25); }
+
+/* Active Highlight state for pin */
+.map-node-pin.active .pin-marker {
+  transform: scale(1.5);
+  box-shadow: 0 0 10px currentColor;
+  border-color: #FFF;
+}
+
+.map-node-pin.active .pin-pulse {
+  transform: scale(1.3);
+  opacity: 0.8;
+  animation: pinPulseLoop 1.2s infinite ease-out;
+}
+
+@keyframes pinPulseLoop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* ─── Detail Card Popup ─── */
+.campus-detail-card {
+  margin-top: var(--space-6);
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.campus-detail-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.detail-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.detail-card-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-3);
+}
+
+.detail-cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.detail-cat-badge.academic { background: rgba(34, 211, 238, 0.1); color: var(--color-accent); }
+.detail-cat-badge.hostel { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+.detail-cat-badge.food { background: rgba(245, 158, 11, 0.1); color: var(--color-accent-secondary); }
+.detail-cat-badge.amenities { background: rgba(34, 197, 94, 0.1); color: var(--color-success); }
+
+.detail-card-top h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+  flex-grow: 1;
+}
+
+.detail-code-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.03);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.detail-description {
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.detail-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+  background: rgba(255, 255, 255, 0.01);
+  padding: var(--space-4);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.meta-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.meta-text strong {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+}
+
+.meta-text span {
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes campusFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: campusFadeIn 0.4s ease-out;
+}
+

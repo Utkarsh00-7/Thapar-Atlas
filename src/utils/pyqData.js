@@ -1,0 +1,235 @@
+/* ═══════════════════════════════════════════════════════════════
+   Thapar Atlas — PYQ Hub Data Store
+   Flat array schema for efficient global searching & filtering.
+   ═══════════════════════════════════════════════════════════════ */
+
+export const pyqData = [
+  {
+    id: 'pyq-calc-mst-2024',
+    subjectCode: 'UTA018',
+    subjectName: 'Calculus & Ordinary Differential Equations',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'MST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 124
+  },
+  {
+    id: 'pyq-calc-est-2024',
+    subjectCode: 'UTA018',
+    subjectName: 'Calculus & Ordinary Differential Equations',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 245
+  },
+  {
+    id: 'pyq-calc-mst-2023',
+    subjectCode: 'UTA018',
+    subjectName: 'Calculus & Ordinary Differential Equations',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'MST',
+    paperYear: '2023',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 98
+  },
+  {
+    id: 'pyq-chem-est-2024',
+    subjectCode: 'UCB008',
+    subjectName: 'Applied Chemistry',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 189
+  },
+  {
+    id: 'pyq-pps-mst-2024',
+    subjectCode: 'UTA024',
+    subjectName: 'Programming for Problem Solving',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'MST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 312
+  },
+  {
+    id: 'pyq-pps-est-2024',
+    subjectCode: 'UTA024',
+    subjectName: 'Programming for Problem Solving',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 420
+  },
+  {
+    id: 'pyq-eee-mst-2023',
+    subjectCode: 'UEE001',
+    subjectName: 'Electrical & Electronic Engineering',
+    studyYear: 1,
+    branch: 'Pool A',
+    examType: 'MST',
+    paperYear: '2023',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 87
+  },
+  {
+    id: 'pyq-dela-est-2024',
+    subjectCode: 'UTA002',
+    subjectName: 'Differential Equations and Linear Algebra',
+    studyYear: 1,
+    branch: 'Pool B',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 156
+  },
+  {
+    id: 'pyq-phys-est-2024',
+    subjectCode: 'UPH004',
+    subjectName: 'Applied Physics',
+    studyYear: 1,
+    branch: 'Pool B',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 231
+  },
+  {
+    id: 'pyq-mp-mst-2023',
+    subjectCode: 'UTA026',
+    subjectName: 'Manufacturing Processes',
+    studyYear: 1,
+    branch: 'Pool B',
+    examType: 'MST',
+    paperYear: '2023',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 74
+  },
+  {
+    id: 'pyq-dsa-mst-2024',
+    subjectCode: 'UCS301',
+    subjectName: 'Data Structures and Algorithms',
+    studyYear: 2,
+    branch: 'CSE/ECE/EE',
+    examType: 'MST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 512
+  },
+  {
+    id: 'pyq-dsa-est-2024',
+    subjectCode: 'UCS301',
+    subjectName: 'Data Structures and Algorithms',
+    studyYear: 2,
+    branch: 'CSE/ECE/EE',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 642
+  },
+  {
+    id: 'pyq-dbms-est-2024',
+    subjectCode: 'UCS310',
+    subjectName: 'Database Management Systems',
+    studyYear: 2,
+    branch: 'CSE/CE',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 389
+  },
+  {
+    id: 'pyq-os-mst-2024',
+    subjectCode: 'UCS303',
+    subjectName: 'Operating Systems',
+    studyYear: 2,
+    branch: 'CSE/CE',
+    examType: 'MST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 278
+  },
+  {
+    id: 'pyq-os-est-2024',
+    subjectCode: 'UCS303',
+    subjectName: 'Operating Systems',
+    studyYear: 2,
+    branch: 'CSE/CE',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 405
+  },
+  {
+    id: 'pyq-csa-mst-2023',
+    subjectCode: 'UCS407',
+    subjectName: 'Computer System Architecture',
+    studyYear: 2,
+    branch: 'CSE/ECE',
+    examType: 'MST',
+    paperYear: '2023',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 145
+  },
+  {
+    id: 'pyq-cn-est-2024',
+    subjectCode: 'UCS503',
+    subjectName: 'Computer Networks',
+    studyYear: 3,
+    branch: 'CSE/ECE',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 320
+  },
+  {
+    id: 'pyq-toc-mst-2024',
+    subjectCode: 'UCS501',
+    subjectName: 'Theory of Computation',
+    studyYear: 3,
+    branch: 'CSE',
+    examType: 'MST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: '#',
+    downloads: 210
+  },
+  {
+    id: 'pyq-ai-est-2024',
+    subjectCode: 'UCS608',
+    subjectName: 'Artificial Intelligence',
+    studyYear: 3,
+    branch: 'CSE/CSBS',
+    examType: 'EST',
+    paperYear: '2024',
+    fileUrl: '#',
+    answerUrl: null,
+    downloads: 450
+  }
+];
