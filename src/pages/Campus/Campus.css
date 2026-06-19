@@ -278,6 +278,7 @@
   position: relative;
   cursor: grab;
   user-select: none;
+  touch-action: none; /* CRITICAL: Prevents viewport scroll/pinch conflicts on touch devices */
 }
 
 .map-canvas-container:active {
@@ -303,299 +304,6 @@
   left: 0;
 }
 
-/* ─── Vector Building Replica Styles ─── */
-.map-building-group {
-  cursor: pointer;
-}
-
-.building-shape {
-  fill: rgba(255, 255, 255, 0.025);
-  stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 0.25px;
-  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-/* Academic Outlines */
-.map-building-group.academic .building-shape {
-  fill: rgba(34, 211, 238, 0.01);
-  stroke: rgba(34, 211, 238, 0.25);
-}
-.map-building-group.academic:hover .building-shape {
-  fill: rgba(34, 211, 238, 0.08);
-  stroke: rgba(34, 211, 238, 0.75);
-  filter: drop-shadow(0 0 1.5px rgba(34, 211, 238, 0.5));
-}
-.map-building-group.academic.active .building-shape {
-  fill: rgba(34, 211, 238, 0.15);
-  stroke: rgba(34, 211, 238, 1);
-  stroke-width: 0.45px;
-  filter: drop-shadow(0 0 3px rgba(34, 211, 238, 0.7));
-}
-
-/* Hostels Outlines */
-.map-building-group.hostel .building-shape {
-  fill: rgba(139, 92, 246, 0.01);
-  stroke: rgba(139, 92, 246, 0.25);
-}
-.map-building-group.hostel:hover .building-shape {
-  fill: rgba(139, 92, 246, 0.08);
-  stroke: rgba(139, 92, 246, 0.75);
-  filter: drop-shadow(0 0 1.5px rgba(139, 92, 246, 0.5));
-}
-.map-building-group.hostel.active .building-shape {
-  fill: rgba(139, 92, 246, 0.15);
-  stroke: rgba(139, 92, 246, 1);
-  stroke-width: 0.45px;
-  filter: drop-shadow(0 0 3px rgba(139, 92, 246, 0.7));
-}
-
-/* Food Outlines */
-.map-building-group.food .building-shape {
-  fill: rgba(245, 158, 11, 0.01);
-  stroke: rgba(245, 158, 11, 0.25);
-}
-.map-building-group.food:hover .building-shape {
-  fill: rgba(245, 158, 11, 0.08);
-  stroke: rgba(245, 158, 11, 0.75);
-  filter: drop-shadow(0 0 1.5px rgba(245, 158, 11, 0.5));
-}
-.map-building-group.food.active .building-shape {
-  fill: rgba(245, 158, 11, 0.15);
-  stroke: rgba(245, 158, 11, 1);
-  stroke-width: 0.45px;
-  filter: drop-shadow(0 0 3px rgba(245, 158, 11, 0.7));
-}
-
-/* Amenities Outlines */
-.map-building-group.amenities .building-shape {
-  fill: rgba(34, 197, 94, 0.01);
-  stroke: rgba(34, 197, 94, 0.25);
-}
-.map-building-group.amenities:hover .building-shape {
-  fill: rgba(34, 197, 94, 0.08);
-  stroke: rgba(34, 197, 94, 0.75);
-  filter: drop-shadow(0 0 1.5px rgba(34, 197, 94, 0.5));
-}
-.map-building-group.amenities.active .building-shape {
-  fill: rgba(34, 197, 94, 0.15);
-  stroke: rgba(34, 197, 94, 1);
-  stroke-width: 0.45px;
-  filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.7));
-}
-
-/* Text labels on map */
-.building-text {
-  font-family: var(--font-body);
-  font-size: 0.65px;
-  font-weight: 700;
-  fill: var(--color-text-secondary);
-  text-anchor: middle;
-  dominant-baseline: middle;
-  pointer-events: none;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  opacity: 0.55;
-  transition: opacity 0.25s ease, fill 0.25s ease;
-}
-
-.map-building-group:hover .building-text,
-.map-building-group.active .building-text {
-  opacity: 1;
-  fill: var(--color-text-primary);
-}
-
-/* Gate Marker styling */
-.map-gate-marker text {
-  font-family: var(--font-heading);
-  font-size: 0.8px;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  pointer-events: none;
-}
-
-/* ─── Node Pins ─── */
-.map-node-pin {
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  transform: translate(-50%, -50%);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* Let click pass through directly to custom SVG path */
-}
-
-.pin-marker {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  border: 1px solid #FFF;
-  z-index: 2;
-  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.pin-pulse {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: rgba(34, 211, 238, 0.25);
-  transform: scale(0.4);
-  opacity: 0;
-  transition: all 0.25s ease;
-  z-index: 1;
-}
-
-/* Color codes */
-.map-node-pin.academic .pin-marker { background-color: var(--color-accent); }
-.map-node-pin.academic .pin-pulse { background-color: rgba(34, 211, 238, 0.25); }
-
-.map-node-pin.hostel .pin-marker { background-color: #8B5CF6; }
-.map-node-pin.hostel .pin-pulse { background-color: rgba(139, 92, 246, 0.25); }
-
-.map-node-pin.food .pin-marker { background-color: var(--color-accent-secondary); }
-.map-node-pin.food .pin-pulse { background-color: rgba(245, 158, 11, 0.25); }
-
-.map-node-pin.amenities .pin-marker { background-color: var(--color-success); }
-.map-node-pin.amenities .pin-pulse { background-color: rgba(34, 197, 94, 0.25); }
-
-/* Active Highlight state for pin */
-.map-node-pin.active .pin-marker {
-  transform: scale(1.5);
-  box-shadow: 0 0 10px currentColor;
-  border-color: #FFF;
-}
-
-.map-node-pin.active .pin-pulse {
-  transform: scale(1.3);
-  opacity: 0.8;
-  animation: pinPulseLoop 1.2s infinite ease-out;
-}
-
-@keyframes pinPulseLoop {
-  0% {
-    transform: scale(0.4);
-    opacity: 0.8;
-  }
-  100% {
-    transform: scale(1.6);
-    opacity: 0;
-  }
-}
-
-/* ─── Detail Card Popup ─── */
-.campus-detail-card {
-  margin-top: var(--space-6);
-  border: 1px solid var(--color-border);
-  position: relative;
-  overflow: hidden;
-}
-
-.campus-detail-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--color-accent);
-}
-
-.detail-card-inner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
-.detail-card-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: var(--space-3);
-}
-
-.detail-cat-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-}
-
-.detail-cat-badge.academic { background: rgba(34, 211, 238, 0.1); color: var(--color-accent); }
-.detail-cat-badge.hostel { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
-.detail-cat-badge.food { background: rgba(245, 158, 11, 0.1); color: var(--color-accent-secondary); }
-.detail-cat-badge.amenities { background: rgba(34, 197, 94, 0.1); color: var(--color-success); }
-
-.detail-card-top h2 {
-  font-size: 1.35rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0;
-  flex-grow: 1;
-}
-
-.detail-code-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
-  background: rgba(255, 255, 255, 0.03);
-  padding: 3px 8px;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.detail-description {
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.detail-meta-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: var(--space-4);
-  background: rgba(255, 255, 255, 0.01);
-  padding: var(--space-4);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-}
-
-.meta-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-}
-
-.meta-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.meta-text strong {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  color: var(--color-text-secondary);
-  letter-spacing: 0.03em;
-}
-
-.meta-text span {
-  font-size: 0.9rem;
-  color: var(--color-text-primary);
-}
-
 .animate-spin-slow {
   animation: spinSlow 12s linear infinite;
 }
@@ -618,5 +326,80 @@
 
 .fade-in {
   animation: campusFadeIn 0.4s ease-out;
+}
+
+/* ─── Responsive & Mobile Styles ─── */
+@media (max-width: 768px) {
+  .campus-page {
+    padding: var(--space-4) 0 var(--space-12);
+  }
+
+  .campus-container {
+    padding: 0 var(--space-4);
+  }
+
+  .campus-header {
+    margin-bottom: var(--space-4);
+  }
+
+  .campus-map-card {
+    height: 380px; /* Responsive height for portrait mobile */
+    border-radius: 12px;
+  }
+
+  .map-view-controls {
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    gap: 6px;
+  }
+
+  .map-view-controls button {
+    width: 26px;
+    height: 26px;
+    font-size: 0.85rem;
+  }
+
+  .zoom-indicator {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .campus-map-card {
+    height: 320px; /* Slightly shorter for small portrait screens */
+  }
+}
+
+/* Landscape orientation for mobile / smaller devices */
+@media (max-height: 480px) and (orientation: landscape) {
+  .campus-page {
+    padding: var(--space-2) 0 var(--space-6);
+  }
+
+  .campus-header {
+    margin-bottom: var(--space-2);
+  }
+
+  .campus-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .campus-header p {
+    font-size: 0.85rem;
+    max-width: 80%;
+  }
+
+  .campus-map-card {
+    height: 220px; /* Fits nicely in landscape height without breaking scroll */
+    border-radius: 8px;
+  }
+
+  .map-view-controls {
+    top: 8px;
+    right: 8px;
+    padding: 2px 6px;
+  }
 }
 

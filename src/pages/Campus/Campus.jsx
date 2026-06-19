@@ -40,29 +40,50 @@ export default function Campus() {
     return { x: clampedX, y: clampedY };
   };
 
-  // Center and clamp map offset on mount and when zoom level or container size changes
+  // 1. Initial fit zoom on mount and window resize/orientation changes
   useEffect(() => {
-    const handleCenterAndClamp = () => {
-      setPanOffset(prev => getClampedOffset(prev.x, prev.y, zoomLevel));
+    const handleResize = () => {
+      if (mapContainerRef.current) {
+        const rect = mapContainerRef.current.getBoundingClientRect();
+        const zoomX = rect.width / 1000;
+        const zoomY = rect.height / 625;
+        const fitZoom = Math.min(zoomX, zoomY);
+        
+        setZoomLevel(fitZoom);
+        setPanOffset({
+          x: (rect.width - 1000 * fitZoom) / 2,
+          y: (rect.height - 625 * fitZoom) / 2
+        });
+      }
     };
 
-    handleCenterAndClamp();
-    window.addEventListener('resize', handleCenterAndClamp);
-    return () => window.removeEventListener('resize', handleCenterAndClamp);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 2. Clamp offsets when zoom level changes (due to user zoom buttons)
+  useEffect(() => {
+    setPanOffset(prev => getClampedOffset(prev.x, prev.y, zoomLevel));
   }, [zoomLevel]);
 
   // Zoom controls
   const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.2, 3));
-  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.2, 0.6));
+  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 0.2, 0.2));
   const handleZoomReset = () => {
-    setZoomLevel(1);
     if (mapContainerRef.current) {
       const rect = mapContainerRef.current.getBoundingClientRect();
+      const zoomX = rect.width / 1000;
+      const zoomY = rect.height / 625;
+      const fitZoom = Math.min(zoomX, zoomY);
+      
+      setZoomLevel(fitZoom);
       setPanOffset({
-        x: (rect.width - 1000) / 2,
-        y: (rect.height - 625) / 2
+        x: (rect.width - 1000 * fitZoom) / 2,
+        y: (rect.height - 625 * fitZoom) / 2
       });
     } else {
+      setZoomLevel(1);
       setPanOffset({ x: 0, y: 0 });
     }
   };

@@ -9,6 +9,7 @@ import Resources from './pages/Resources/Resources';
 import Pyqs from './pages/Pyqs/Pyqs';
 import GpaTools from './pages/GpaTools/GpaTools';
 import Campus from './pages/Campus/Campus';
+import Societies from './pages/Societies/Societies';
 import Contribute from './pages/Contribute/Contribute';
 import Admin from './pages/Admin/Admin';
 import NotFound from './pages/NotFound/NotFound';
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="pyqs" element={<Pyqs />} />
           <Route path="gpa" element={<GpaTools />} />
           <Route path="campus" element={<Campus />} />
+          <Route path="societies" element={<Societies />} />
           <Route path="contribute" element={<Contribute />} />
           <Route path="admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />

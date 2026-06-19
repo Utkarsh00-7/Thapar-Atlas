@@ -6,6 +6,7 @@ import {
   Upload,
   ShieldCheck,
   FileText,
+  Sparkles,
 } from 'lucide-react';
 
 /* ─── Grade System (TIET) ─────────────────────────────── */
@@ -77,19 +78,23 @@ export const NAV_ITEMS = [
   { label: 'Home', path: '/', icon: Home },
   { label: 'Resources', path: '/resources', icon: FolderOpen },
   { label: 'PYQ Hub', path: '/pyqs', icon: FileText },
+  { label: 'Societies', path: '/societies', icon: Sparkles },
   { label: 'GPA Tools', path: '/gpa', icon: Calculator },
   { label: 'Campus', path: '/campus', icon: MapPin },
-  { label: 'Admin', path: '/admin', icon: ShieldCheck },
+];
+
+export const ADMIN_EMAILS = [
+  'umanglik_be25@thapar.edu'
 ];
 
 export const FOOTER_NAV = {
   quickLinks: [
     { label: 'Resources', path: '/resources' },
     { label: 'PYQ Hub', path: '/pyqs' },
+    { label: 'Societies Directory', path: '/societies' },
     { label: 'GPA Tools', path: '/gpa' },
     { label: 'Campus Map', path: '/campus' },
     { label: 'Contribute', path: '/contribute' },
-    { label: 'Admin Panel', path: '/admin' },
   ],
   thaparResources: [
     { label: 'Central Library', href: 'https://library.thapar.edu/' },

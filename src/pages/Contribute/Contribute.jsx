@@ -13,19 +13,40 @@ import {
   Sparkles,
   Paperclip,
   Trash2,
+  LogIn,
 } from 'lucide-react';
 import { getAcademicData } from '../../utils/resourceDb';
 import { resourceTypes } from '../../utils/resourcesData';
 import { addPendingContribution } from '../../utils/contributionDb';
+import { useAuth } from '../../context/AuthContext';
 import './Contribute.css';
 
 export default function Contribute() {
+  const { user, loginWithGoogle } = useAuth();
+  
   // Academic database structure state
   const [academicData, setAcademicData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Form states
   const [name, setName] = useState('');
+
+  // Sync contributor name with logged in Google account
+  useEffect(() => {
+    if (user) {
+      setName(user.displayName || '');
+    } else {
+      setName('');
+    }
+  }, [user]);
+
+  const handleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (err) {
+      console.error("Contribute page login failed:", err);
+    }
+  };
   const [yearId, setYearId] = useState(1);
   const [branchId, setBranchId] = useState('');
   const [subjectId, setSubjectId] = useState('');
@@ -202,6 +223,8 @@ export default function Contribute() {
 
       const contribution = {
         contributorName: name.trim() || 'Anonymous',
+        contributorEmail: user ? user.email : '',
+        contributorUid: user ? user.uid : '',
         yearId: Number(yearId),
         branchId,
         subjectId,
@@ -248,6 +271,29 @@ export default function Contribute() {
         <div className="resources-loading-container" style={{ margin: 'auto' }}>
           <div className="resources-loading-spinner" style={{ margin: '0 auto 16px auto' }}></div>
           <p>Connecting to database archives...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="contribute-page success-state">
+        <div className="success-card glass-panel text-center">
+          <AlertCircle className="success-icon animate-pulse" size={48} style={{ color: 'var(--color-accent)', margin: '0 auto var(--space-4) auto' }} />
+          <h1 className="gradient-text">Sign In Required</h1>
+          <p>
+            To maintain academic integrity and prevent spam, resource uploads are restricted to official <strong>@thapar.edu</strong> accounts.
+          </p>
+          <div className="button-group">
+            <button className="btn-cosmic btn-glow" onClick={handleLogin}>
+              <LogIn size={18} />
+              <span>Sign In with Google</span>
+            </button>
+            <Link to="/resources" className="btn-secondary">
+              Go to Resource Hub
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -309,13 +355,13 @@ export default function Contribute() {
               <h3><User className="section-icon" /> Contributor Details</h3>
               <div className="form-grid-2">
                 <div className="form-group">
-                  <label htmlFor="name-input">Your Name (Optional)</label>
+                  <label htmlFor="name-input">Logged In As</label>
                   <input
                     id="name-input"
                     type="text"
-                    placeholder="e.g. Amit Kumar (or leave blank for Anonymous)"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={`${user.displayName} (${user.email})`}
+                    disabled
+                    style={{ opacity: 0.85, cursor: 'not-allowed', background: 'rgba(255, 255, 255, 0.02)' }}
                   />
                 </div>
                 <div className="form-group">

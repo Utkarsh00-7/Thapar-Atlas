@@ -21,6 +21,9 @@ import {
   Clock,
   Filter,
   FileCheck,
+  LogIn,
+  LogOut,
+  ShieldAlert,
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
 import {
@@ -41,9 +44,13 @@ import {
   resetPyqDatabase,
 } from '../../utils/pyqDb';
 import { getDownloadLink } from '../../utils/helpers';
+import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
+import { ADMIN_EMAILS } from '../../utils/constants';
 import './Admin.css';
 
 export default function Admin() {
+  const { user, loading: authLoading, loginWithGoogle, logout } = useAuth();
   const [academicData, setAcademicData] = useState([]);
   const [activeTab, setActiveTab] = useState('resources'); // 'resources', 'moderation', 'pyqs'
   const [pendingContributions, setPendingContributions] = useState([]);
@@ -313,6 +320,49 @@ export default function Admin() {
       p.branch.toLowerCase().includes(pyqSearch.toLowerCase())
     );
   }, [pyqs, pyqSearch]);
+
+  if (authLoading) {
+    return (
+      <div className="admin-page success-state" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '65vh' }}>
+        <div className="resources-loading-container" style={{ margin: 'auto' }}>
+          <div className="resources-loading-spinner" style={{ margin: '0 auto 16px auto' }}></div>
+          <p>Verifying credentials...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
+
+  if (!isAdmin) {
+    return (
+      <div className="admin-page success-state" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+        <div className="success-card glass-panel text-center" style={{ maxWidth: '480px', padding: '40px' }}>
+          <ShieldAlert className="success-icon animate-pulse" size={48} style={{ color: '#ef4444', margin: '0 auto var(--space-4) auto' }} />
+          <h1 style={{ color: '#f87171', fontSize: '1.75rem', marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>Access Denied</h1>
+          <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6', marginBottom: '24px', fontSize: '0.95rem' }}>
+            This administrator panel is restricted to authorized credentials. You do not have permissions to view this dashboard.
+          </p>
+          <div className="button-group" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {!user ? (
+              <button className="btn-cosmic btn-glow" onClick={loginWithGoogle} style={{ width: '100%' }}>
+                <LogIn size={16} style={{ marginRight: '8px' }} />
+                Sign In with Admin Account
+              </button>
+            ) : (
+              <button className="btn-cosmic btn-glow" onClick={logout} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171' }}>
+                <LogOut size={16} style={{ marginRight: '8px' }} />
+                Switch Account / Sign Out
+              </button>
+            )}
+            <Link to="/" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', textDecoration: 'underline', marginTop: '8px' }}>
+              Return to Home Page
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-page">

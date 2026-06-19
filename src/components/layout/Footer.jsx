@@ -1,8 +1,18 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { FOOTER_NAV } from '../../utils/constants';
+import { FOOTER_NAV, ADMIN_EMAILS } from '../../utils/constants';
+import { useAuth } from '../../context/AuthContext';
 import './Footer.css';
 
 export default function Footer() {
+  const { user } = useAuth();
+
+  const displayedQuickLinks = useMemo(() => {
+    const isAdmin = user && user.email && ADMIN_EMAILS.includes(user.email);
+    return isAdmin
+      ? [...FOOTER_NAV.quickLinks, { label: 'Admin Panel', path: '/admin' }]
+      : FOOTER_NAV.quickLinks;
+  }, [user]);
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -12,7 +22,7 @@ export default function Footer() {
           <div>
             <h4 className="footer__col-title">Quick Links</h4>
             <ul className="footer__col-links">
-              {FOOTER_NAV.quickLinks.map(({ label, path }) => (
+              {displayedQuickLinks.map(({ label, path }) => (
                 <li key={path}>
                   <Link to={path}>{label}</Link>
                 </li>

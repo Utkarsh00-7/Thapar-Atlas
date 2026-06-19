@@ -1,15 +1,56 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Menu, LogIn, User, Settings, Sparkles } from 'lucide-react';
-import { NAV_ITEMS } from '../../utils/constants';
+import { Menu, LogIn, User, Sparkles, LogOut, Loader2, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { NAV_ITEMS, ADMIN_EMAILS } from '../../utils/constants';
 import { cn } from '../../utils/helpers';
+import { useAuth } from '../../context/AuthContext';
 import MobileNav from './MobileNav';
 import './Header.css';
 
 export default function Header({ theme, toggleTheme }) {
+  const { user, loading, loginWithGoogle, logout } = useAuth();
+
+  const displayedNavItems = useMemo(() => {
+    const isAdmin = user && user.email && ADMIN_EMAILS.includes(user.email);
+    return isAdmin
+      ? [...NAV_ITEMS, { label: 'Admin', path: '/admin', icon: ShieldCheck }]
+      : NAV_ITEMS;
+  }, [user]);
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+
+  // Dropdown & login error states
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const dropdownRef = useRef(null);
+
+  const handleLogin = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (err) {
+      console.error("Login error details:", err);
+      setErrorMessage(err.message || "Failed to sign in. Please try again.");
+      setShowErrorToast(true);
+      setTimeout(() => setShowErrorToast(false), 6000);
+    }
+  };
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [dropdownOpen]);
 
   // Navigation indicator state
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
@@ -29,7 +70,7 @@ export default function Header({ theme, toggleTheme }) {
 
   // Set active link positions
   const updateIndicatorToActive = useCallback(() => {
-    const activeIndex = NAV_ITEMS.findIndex(({ path }) => {
+    const activeIndex = displayedNavItems.findIndex(({ path }) => {
       if (path === '/') return location.pathname === '/';
       return location.pathname.startsWith(path);
     });
@@ -49,7 +90,7 @@ export default function Header({ theme, toggleTheme }) {
       setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }));
       setDotStyle((prev) => ({ ...prev, opacity: 0 }));
     }
-  }, [location.pathname]);
+  }, [location.pathname, displayedNavItems]);
 
   useEffect(() => {
     const timer = setTimeout(updateIndicatorToActive, 60);
@@ -149,7 +190,7 @@ export default function Header({ theme, toggleTheme }) {
               }}
             />
 
-            {NAV_ITEMS.map(({ label, path, icon: Icon }, idx) => (
+            {displayedNavItems.map(({ label, path, icon: Icon }, idx) => (
               <NavLink
                 key={path}
                 to={path}
@@ -179,19 +220,73 @@ export default function Header({ theme, toggleTheme }) {
           <div className="header__actions">
             {/* Unified glass actions container */}
             <div className="header__actions-glass">
-              <button className="header__action-btn" type="button" aria-label="Profile">
-                <User size={18} />
-              </button>
-              <button className="header__action-btn" type="button" aria-label="Settings">
-                <Settings size={18} />
-              </button>
-              <button className="header__action-btn header__sign-in-pill" type="button">
-                <div className="header__avatar-fallback">
-                  <User size={12} />
+
+              {loading ? (
+                <button className="header__action-btn header__sign-in-pill header__sign-in-pill--loading" disabled type="button">
+                  <Loader2 className="animate-spin" size={14} />
+                  <span>Connecting...</span>
+                </button>
+              ) : user ? (
+                <div className="header__user-menu" ref={dropdownRef}>
+                  <button 
+                    className="header__action-btn header__user-pill" 
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    type="button"
+                  >
+                    <div className="header__avatar-wrapper">
+                      {user.photoURL ? (
+                        <img src={user.photoURL} alt={user.displayName} className="header__avatar-img" />
+                      ) : (
+                        <div className="header__avatar-initials">
+                          {user.displayName ? user.displayName[0].toUpperCase() : 'U'}
+                        </div>
+                      )}
+                    </div>
+                    <span className="header__username-span">{user.displayName ? user.displayName.split(' ')[0] : 'User'}</span>
+                  </button>
+                  
+                  {dropdownOpen && (
+                    <div className="header__dropdown glass-panel">
+                      <div className="header__dropdown-user-info">
+                        <p className="header__dropdown-name">{user.displayName}</p>
+                        <p className="header__dropdown-email">{user.email}</p>
+                      </div>
+                      <div className="header__dropdown-divider" />
+                      <button 
+                        className="header__dropdown-item header__dropdown-item--logout"
+                        onClick={() => {
+                          setDropdownOpen(false);
+                          logout();
+                        }}
+                        type="button"
+                      >
+                        <LogOut size={14} />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
-                <span>Sign In</span>
-              </button>
+              ) : (
+                <button 
+                  className="header__action-btn header__sign-in-pill" 
+                  onClick={handleLogin}
+                  type="button"
+                >
+                  <div className="header__avatar-fallback">
+                    <LogIn size={12} />
+                  </div>
+                  <span>Sign In</span>
+                </button>
+              )}
             </div>
+
+            {/* Error Toast */}
+            {showErrorToast && (
+              <div className="header__error-toast glass-panel">
+                <ShieldAlert size={16} className="error-toast-icon" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
 
             {/* Hamburger menu for mobile */}
             <button
