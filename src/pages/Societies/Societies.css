@@ -202,9 +202,50 @@ input:checked + .slider:before {
 }
 
 /* ─── Listing Grid ─── */
+/* ─── Grouped Societies Sections ─── */
+.societies-grouped-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-10);
+}
+
+.society-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  animation: societiesFadeIn 0.5s ease-out;
+}
+
+.group-header-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-bottom: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.group-header-badge h2 {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.group-count-tag {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .societies-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--space-6);
 }
 
@@ -214,18 +255,51 @@ input:checked + .slider:before {
   flex-direction: column;
   height: 100%;
   padding: var(--space-6) !important;
-  background: rgba(13, 13, 20, 0.4) !important;
-  border: 1px solid var(--color-border);
+  background: rgba(18, 18, 29, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
   overflow: hidden;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  backdrop-filter: blur(8px);
 }
 
-.society-card:hover {
+/* Category Specific Hover Glows */
+.society-card.cat-tech:hover {
   transform: translateY(-4px);
-  border-color: rgba(34, 211, 238, 0.25);
-  box-shadow: 0 10px 30px -10px rgba(5, 5, 8, 0.8), 0 0 20px rgba(34, 211, 238, 0.04);
+  border-color: rgba(34, 211, 238, 0.45) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(34, 211, 238, 0.08);
+}
+
+.society-card.cat-cultural:hover {
+  transform: translateY(-4px);
+  border-color: rgba(168, 85, 247, 0.45) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(168, 85, 247, 0.08);
+}
+
+.society-card.cat-literary:hover {
+  transform: translateY(-4px);
+  border-color: rgba(234, 179, 8, 0.45) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(234, 179, 8, 0.08);
+}
+
+.society-card.cat-ent:hover {
+  transform: translateY(-4px);
+  border-color: rgba(34, 197, 94, 0.45) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(34, 197, 94, 0.08);
+}
+
+.society-card.cat-sports:hover {
+  transform: translateY(-4px);
+  border-color: rgba(249, 115, 22, 0.45) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(249, 115, 22, 0.08);
+}
+
+.society-card.cat-social:hover {
+  transform: translateY(-4px);
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), 0 0 22px rgba(59, 130, 246, 0.08);
 }
 
 .society-card-header {

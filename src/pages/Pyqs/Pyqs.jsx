@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   FileText,
   Search,
@@ -18,6 +18,8 @@ import { getDownloadLink } from '../../utils/helpers';
 import './Pyqs.css';
 
 export default function Pyqs() {
+  const location = useLocation();
+
   const [pyqs, setPyqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,6 +33,16 @@ export default function Pyqs() {
       try {
         const data = await getPyqData();
         setPyqs(data);
+
+        // Prepopulate filter state from router state if redirecting from Syllabus Tracker
+        if (location.state) {
+          if (location.state.searchQuery) {
+            setSearchQuery(location.state.searchQuery);
+          }
+          if (location.state.selectedYear) {
+            setSelectedYear(String(location.state.selectedYear));
+          }
+        }
       } catch (err) {
         console.error('Failed to load PYQs: ', err);
       } finally {
@@ -38,7 +50,7 @@ export default function Pyqs() {
       }
     }
     loadData();
-  }, []);
+  }, [location.state]);
 
   // Generate unique paper years for filter dropdown
   const paperYears = useMemo(() => {

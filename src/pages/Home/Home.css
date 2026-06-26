@@ -3,7 +3,12 @@
    ═══════════════════════════════════════════════════════════════ */
 
 .home {
+  /* overflow-x is handled in wrapper to enable sticky elements inside home */
+}
+
+.home-body-wrapper {
   overflow-x: hidden;
+  width: 100%;
 }
 
 /* ─── Container ─── */
@@ -340,9 +345,35 @@
 }
 
 .hero-note {
-  font-size: 0.8rem;
-  color: var(--color-text-tertiary);
-  letter-spacing: 0.02em;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 20px;
+  border-radius: 99px;
+  margin-top: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.hero-note .heart-icon {
+  display: inline-block;
+  animation: heartPulse 1.4s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes heartPulse {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.25); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.25); }
+  70% { transform: scale(1); }
 }
 
 /* ─── Branching Node Diagram ─── */
@@ -760,6 +791,124 @@
   margin-bottom: var(--space-8);
 }
 
+.announcements-loading-preview {
+  text-align: center;
+  padding: var(--space-12) 0;
+  color: var(--color-text-secondary);
+}
+
+.spinner-preview {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top: 2px solid var(--color-accent);
+  margin: 0 auto var(--space-3) auto;
+  animation: spin 1s linear infinite;
+}
+
+.announcements-grid-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-6);
+}
+
+.announcement-card-preview {
+  padding: var(--space-5);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.announcement-card-preview:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.announcement-card-preview.important {
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+}
+
+.card-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.category-tag-preview {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.category-tag-preview.ACADEMIC {
+  background: rgba(34, 211, 238, 0.1);
+  color: var(--color-accent);
+}
+
+.category-tag-preview.SOCIETY {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+}
+
+.category-tag-preview.EVENT {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+
+.category-tag-preview.PLACEMENT {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+}
+
+.category-tag-preview.GENERAL {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary);
+}
+
+.date-tag-preview {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+}
+
+.announcement-card-preview h3 {
+  font-size: 1.05rem;
+  font-family: var(--font-heading);
+  margin-bottom: var(--space-2);
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+
+.announcement-card-preview p {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+  flex-grow: 1;
+}
+
+.card-preview-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: opacity var(--transition-fast);
+  margin-top: auto;
+}
+
+.card-preview-link:hover {
+  opacity: 0.8;
+}
+
 .announcements-empty {
   text-align: center;
   padding: var(--space-12) var(--space-6);
@@ -784,6 +933,116 @@
   font-size: var(--text-sm);
   color: var(--color-text-tertiary);
 }
+
+/* URGENT TOP TICKER BANNER */
+.urgent-banners-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  z-index: 100;
+}
+
+.urgent-banner-ticker {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.95), rgba(185, 28, 28, 0.95));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+  position: relative;
+  left: 0;
+  right: 0;
+  animation: slideDownBanner 0.4s ease-out;
+  
+  max-height: 200px;
+  opacity: 1;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.3s ease,
+              border-bottom-color 0.3s ease;
+}
+
+.urgent-banner-ticker.dismissing {
+  max-height: 0;
+  opacity: 0;
+  border-bottom-color: transparent;
+  pointer-events: none;
+}
+
+.urgent-banner-content {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-10) var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.urgent-dismiss-btn {
+  position: absolute;
+  right: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.urgent-dismiss-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.urgent-pill {
+  background: #ffffff;
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  animation: pulseScale 1s infinite alternate;
+}
+
+.urgent-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.urgent-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  transition: opacity var(--transition-fast);
+}
+
+.urgent-link:hover {
+  opacity: 0.8;
+}
+
+@keyframes slideDownBanner {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes pulseScale {
+  from { transform: scale(1); }
+  to { transform: scale(1.05); }
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    RESPONSIVE — MOBILE

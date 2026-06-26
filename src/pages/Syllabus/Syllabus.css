@@ -1,0 +1,668 @@
+/* ═══════════════════════════════════════════════════════════════
+   SYLLABUS PROGRESS TRACKER & STUDY HUB — Styles
+   Follows the cosmic glassmorphic theme of Thapar Atlas
+   ═══════════════════════════════════════════════════════════════ */
+
+.syllabus-page {
+  min-height: calc(100vh - 68px);
+  padding: var(--space-8) 0 var(--space-20);
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.syllabus-container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ─── Header Section ─── */
+.syllabus-header {
+  margin-bottom: var(--space-2);
+}
+
+.syllabus-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  color: var(--color-accent-text);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.15);
+}
+
+.syllabus-badge .badge-icon {
+  animation: pulseScale 1.5s infinite alternate;
+}
+
+.syllabus-header h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin-bottom: var(--space-2);
+  background: linear-gradient(135deg, #ffffff 40%, #c084fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.syllabus-header p {
+  font-size: var(--text-md);
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Search Bar ─── */
+.syllabus-search-wrapper {
+  position: relative;
+  max-width: 650px;
+  width: 100%;
+  margin: 0 auto var(--space-4) auto;
+}
+
+.search-input-container {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0 var(--space-4);
+  height: 52px;
+  transition: all 0.25s ease;
+}
+
+.search-input-container:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.search-input-container .search-icon {
+  color: var(--color-text-tertiary);
+  margin-right: var(--space-3);
+  flex-shrink: 0;
+}
+
+.search-input-container input {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.search-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.search-clear-btn:hover {
+  color: var(--color-text-primary);
+}
+
+/* Search Dropdown Suggests */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.dropdown-title {
+  padding: var(--space-3) var(--space-4);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dropdown-item {
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dropdown-item .item-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.dropdown-item .item-details-badge {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ─── Year selector Tabs ─── */
+.syllabus-tabs-year {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .syllabus-tabs-year {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.year-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.year-tab-btn:hover {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateY(-2px);
+}
+
+.year-tab-btn.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(99, 102, 241, 0.05) 100%);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+  box-shadow: 0 4px 20px -5px rgba(139, 92, 246, 0.3);
+}
+
+.year-tab-btn svg {
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+  transition: color 0.3s;
+}
+
+.year-tab-btn.active svg {
+  color: var(--color-accent);
+}
+
+.year-tab-btn .btn-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.year-tab-btn .tab-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.year-tab-btn .tab-tagline {
+  font-size: 0.72rem;
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Branch selector Pills ─── */
+.syllabus-tabs-branch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 9999px;
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .syllabus-tabs-branch {
+    border-radius: var(--radius-md);
+    width: 100%;
+  }
+}
+
+.branch-pill-btn {
+  padding: 6px 16px;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.branch-pill-btn:hover:not(:disabled) {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.branch-pill-btn.active {
+  background: var(--color-accent);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.35);
+}
+
+.branch-pill-btn.coming-soon {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pills-coming-badge {
+  font-size: 0.65rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-secondary);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+/* ─── Cards Grid Layout ─── */
+.syllabus-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.subject-checklist-card {
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow: hidden;
+}
+
+.subject-checklist-card:hover:not(.expanded) {
+  transform: translateX(3px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px -10px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Card Header Main ─── */
+.card-header-main {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr auto;
+  align-items: center;
+  padding: var(--space-5) var(--space-6);
+  cursor: pointer;
+  gap: var(--space-6);
+}
+
+@media (max-width: 600px) {
+  .card-header-main {
+    grid-template-columns: 1fr auto;
+    gap: var(--space-4);
+  }
+}
+
+.subject-info-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.code-credits {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.subj-code {
+  color: var(--color-accent-text);
+  background: rgba(139, 92, 246, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.subj-credits {
+  color: var(--color-text-tertiary);
+}
+
+.subject-info-block h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+/* Horizontal Progress Indicators */
+.subject-progress-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@media (max-width: 600px) {
+  .subject-progress-block {
+    grid-column: 1 / span 2;
+    margin-top: 4px;
+  }
+}
+
+.percentage-text {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-accent-text);
+  text-align: right;
+}
+
+.progress-bar-container {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent) 0%, #6366f1 100%);
+  border-radius: 999px;
+  width: 0;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.expand-chevron {
+  background: transparent;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.card-header-main:hover .expand-chevron {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary);
+}
+
+/* ─── Expanded Body Area ─── */
+.card-expanded-body {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.015);
+  padding: var(--space-6);
+  animation: slideDownAccordion 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes slideDownAccordion {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grid-details-checklist {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  gap: var(--space-8);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .grid-details-checklist {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* ─── Left details column ─── */
+.subject-description-hub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.subj-desc {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.circular-progress-showcase {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.circle-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.04);
+  stroke-width: 6px;
+}
+
+.circle-fill {
+  fill: none;
+  stroke: url(#progressGrad);
+  stroke: var(--color-accent);
+  stroke-width: 6px;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.circle-text-center {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.number-percent {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.percent-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-tertiary);
+  margin-top: 4px;
+}
+
+.checked-counts-indicator {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.quick-links-action-bar {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.quick-links-action-bar button {
+  flex: 1;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ─── Right checklists column ─── */
+.syllabus-units-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+
+/* custom scrollbar for topics */
+.syllabus-units-checklist::-webkit-scrollbar {
+  width: 4px;
+}
+.syllabus-units-checklist::-webkit-scrollbar-track {
+  background: transparent;
+}
+.syllabus-units-checklist::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+}
+
+.unit-container {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.unit-title-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding-bottom: 6px;
+}
+
+.unit-title-line h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.unit-fraction-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-secondary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.topics-list-ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topic-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 6px var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.topic-list-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.checkbox-toggle-btn {
+  background: transparent;
+  border: none;
+  padding: 2px 0 0 0;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.checkbox-icon.checked {
+  color: var(--color-accent);
+}
+
+.topic-text {
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  transition: all 0.2s;
+}
+
+.topic-list-item.completed .topic-text {
+  color: var(--color-text-tertiary);
+  text-decoration: line-through;
+}
+
+/* Empty State / Construction */
+.syllabus-empty-state {
+  padding: var(--space-16) var(--space-6);
+}
+
+.syllabus-empty-state .empty-icon {
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.syllabus-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.syllabus-empty-state p {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  max-width: 400px;
+  margin: 0 auto;
+}

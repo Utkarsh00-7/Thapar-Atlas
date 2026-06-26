@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { getAnnouncements } from '../../utils/announcementsDb';
 import {
   BookOpen,
   Calculator,
@@ -22,6 +23,8 @@ import {
   Terminal,
   Phone,
   LayoutGrid,
+  X,
+  ClipboardList,
 } from 'lucide-react';
 import './Home.css';
 
@@ -152,6 +155,14 @@ const quickAccess = [
     bgColor: 'rgba(34, 211, 238, 0.08)',
   },
   {
+    icon: ClipboardList,
+    title: 'Syllabus Tracker',
+    description: 'Track course units, check off topics, and see live progress bars',
+    path: '/syllabus',
+    color: '#EC4899',
+    bgColor: 'rgba(236, 72, 153, 0.08)',
+  },
+  {
     icon: Calculator,
     title: 'GPA Tools',
     description: 'Calculate SGPA, track CGPA, and plan your academic journey',
@@ -270,10 +281,73 @@ function CardAnimation({ type }) {
 export default function Home() {
   const typedText = useTypingEffect();
 
+  const [announcements, setAnnouncements] = useState([]);
+  const [annLoading, setAnnLoading] = useState(true);
+  const [dismissedAnnIds, setDismissedAnnIds] = useState([]);
+  const [dismissingAnnIds, setDismissingAnnIds] = useState([]);
+
+  const handleDismissAnnouncement = (id) => {
+    setDismissingAnnIds((prev) => [...prev, id]);
+    setTimeout(() => {
+      setDismissedAnnIds((prev) => [...prev, id]);
+      setDismissingAnnIds((prev) => prev.filter((item) => item !== id));
+    }, 300);
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getAnnouncements();
+        setAnnouncements(data);
+      } catch (err) {
+        console.error('Failed to fetch announcements:', err);
+      } finally {
+        setAnnLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  const urgentAnnouncements = useMemo(() => {
+    return announcements.filter(ann => ann.important && !dismissedAnnIds.includes(ann.id));
+  }, [announcements, dismissedAnnIds]);
+
+  const latestAnnouncements = useMemo(() => {
+    return announcements.slice(0, 3);
+  }, [announcements]);
+
   return (
     <div className="home">
-      {/* ━━━ Hero Section ━━━ */}
-      <section className="hero">
+      {urgentAnnouncements.length > 0 && (
+        <div className="urgent-banners-container">
+          {urgentAnnouncements.map((ann) => (
+            <div 
+              key={ann.id} 
+              className={`urgent-banner-ticker ${dismissingAnnIds.includes(ann.id) ? 'dismissing' : ''}`}
+            >
+              <div className="urgent-banner-content">
+                <span className="urgent-pill">URGENT</span>
+                <span className="urgent-text">{ann.title}</span>
+                <Link to="/announcements" className="urgent-link">
+                  Read Details <ChevronRight size={14} />
+                </Link>
+                <button 
+                  type="button" 
+                  onClick={() => handleDismissAnnouncement(ann.id)} 
+                  className="urgent-dismiss-btn"
+                  title="Dismiss alert"
+                  aria-label="Dismiss alert"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="home-body-wrapper">
+        {/* ━━━ Hero Section ━━━ */}
+        <section className="hero">
         {/* Global 3D background handles constellation particle animations */}
         <div className="hero-glow" aria-hidden="true" />
         <div className="hero-content">
@@ -352,7 +426,7 @@ export default function Home() {
           </div>
 
           <p className="hero-note">
-            No login required. Free forever. Made by Thapar students.
+            Explore freely &bull; Free forever &bull; Made with <span className="heart-icon">❤️</span> for TIET Students
           </p>
         </div>
       </section>
@@ -599,13 +673,39 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="announcements-empty">
-            <Bell size={40} className="empty-icon" />
-            <h3>All caught up!</h3>
-            <p>No new announcements right now. Check back soon.</p>
-          </div>
+          {annLoading ? (
+            <div className="announcements-loading-preview">
+              <div className="spinner-preview"></div>
+              <p>Loading latest updates...</p>
+            </div>
+          ) : latestAnnouncements.length > 0 ? (
+            <div className="announcements-grid-preview">
+              {latestAnnouncements.map((ann) => (
+                <div key={ann.id} className={`announcement-card-preview glass-panel ${ann.important ? 'important' : ''}`}>
+                  <div className="card-preview-header">
+                    <span className={`category-tag-preview ${ann.category}`}>
+                      {ann.category.toUpperCase()}
+                    </span>
+                    <span className="date-tag-preview">{ann.date}</span>
+                  </div>
+                  <h3>{ann.title}</h3>
+                  <p>{ann.content.length > 120 ? `${ann.content.substring(0, 120)}...` : ann.content}</p>
+                  <Link to="/announcements" className="card-preview-link">
+                    Read More <ChevronRight size={14} />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="announcements-empty">
+              <Bell size={40} className="empty-icon" />
+              <h3>All caught up!</h3>
+              <p>No new announcements right now. Check back soon.</p>
+            </div>
+          )}
         </div>
       </section>
+      </div>
     </div>
   );
 }

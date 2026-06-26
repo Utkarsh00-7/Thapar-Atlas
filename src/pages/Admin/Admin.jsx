@@ -24,6 +24,9 @@ import {
   LogIn,
   LogOut,
   ShieldAlert,
+  Bell,
+  Tag,
+  Edit,
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
 import {
@@ -47,6 +50,7 @@ import { getDownloadLink } from '../../utils/helpers';
 import { useAuth } from '../../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { ADMIN_EMAILS } from '../../utils/constants';
+import { getAnnouncements, addAnnouncement, deleteAnnouncement } from '../../utils/announcementsDb';
 import './Admin.css';
 
 export default function Admin() {
@@ -55,6 +59,15 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState('resources'); // 'resources', 'moderation', 'pyqs'
   const [pendingContributions, setPendingContributions] = useState([]);
   const [pyqs, setPyqs] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  
+  // Form states for Announcements
+  const [annTitle, setAnnTitle] = useState('');
+  const [annContent, setAnnContent] = useState('');
+  const [annCategory, setAnnCategory] = useState('general');
+  const [annImportant, setAnnImportant] = useState(false);
+  const [annLink, setAnnLink] = useState('');
+  const [editingAnnId, setEditingAnnId] = useState(null);
   
   // Selection states for Resource manager
   const [selectedYearId, setSelectedYearId] = useState(1);
@@ -88,6 +101,9 @@ export default function Admin() {
         
         const pyqsList = await getPyqData();
         setPyqs(pyqsList);
+
+        const annList = await getAnnouncements();
+        setAnnouncements(annList);
       } catch (err) {
         console.error('Failed to load admin data:', err);
       }
@@ -321,6 +337,89 @@ export default function Admin() {
     );
   }, [pyqs, pyqSearch]);
 
+  const handleAddAnnouncement = async (e) => {
+    e.preventDefault();
+    if (!annTitle.trim()) {
+      showToast('Please enter an announcement title.', 'error');
+      return;
+    }
+    const annData = {
+      title: annTitle.trim(),
+      content: annContent.trim(),
+      category: annCategory,
+      important: annImportant,
+      link: annLink.trim(),
+      date: editingAnnId 
+        ? announcements.find(a => a.id === editingAnnId)?.date || new Date().toISOString().split('T')[0]
+        : new Date().toISOString().split('T')[0]
+    };
+    
+    if (editingAnnId) {
+      annData.id = editingAnnId;
+    }
+
+    try {
+      const updated = await addAnnouncement(annData);
+      setAnnouncements(updated);
+      setAnnTitle('');
+      setAnnContent('');
+      setAnnCategory('general');
+      setAnnImportant(false);
+      setAnnLink('');
+      setEditingAnnId(null);
+      showToast(
+        editingAnnId 
+          ? 'Announcement updated successfully!' 
+          : 'Announcement published successfully!', 
+        'success'
+      );
+    } catch (err) {
+      console.error(err);
+      showToast(
+        editingAnnId 
+          ? 'Failed to update announcement.' 
+          : 'Failed to publish announcement.', 
+        'error'
+      );
+    }
+  };
+
+  const handleStartEditAnnouncement = (ann) => {
+    setAnnTitle(ann.title);
+    setAnnContent(ann.content || '');
+    setAnnCategory(ann.category || 'general');
+    setAnnImportant(!!ann.important);
+    setAnnLink(ann.link || '');
+    setEditingAnnId(ann.id);
+    
+    const formElement = document.querySelector('.panel-config');
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setAnnTitle('');
+    setAnnContent('');
+    setAnnCategory('general');
+    setAnnImportant(false);
+    setAnnLink('');
+    setEditingAnnId(null);
+  };
+
+  const handleDeleteAnnouncement = async (id, title) => {
+    if (window.confirm(`Delete announcement "${title}"?`)) {
+      try {
+        const updated = await deleteAnnouncement(id);
+        setAnnouncements(updated);
+        showToast('Announcement deleted successfully.', 'info');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to delete announcement.', 'error');
+      }
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="admin-page success-state" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '65vh' }}>
@@ -426,6 +525,22 @@ export default function Admin() {
             <FileText size={16} />
             <span>PYQ Manager</span>
             <span className="tab-badge secondary">{pyqs.length}</span>
+          </button>
+          <button 
+            className={`admin-tab-btn ${activeTab === 'announcements' ? 'active' : ''}`}
+            onClick={async () => {
+              setActiveTab('announcements');
+              try {
+                const data = await getAnnouncements();
+                setAnnouncements(data);
+              } catch (err) {
+                console.error('Failed to reload announcements:', err);
+              }
+            }}
+          >
+            <Bell size={16} />
+            <span>Announcements</span>
+            <span className="tab-badge secondary">{announcements.length}</span>
           </button>
         </div>
 
@@ -833,6 +948,168 @@ export default function Admin() {
                 <p>No papers match your search queries.</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ═════════ TAB 4: ANNOUNCEMENTS MANAGER ═════════ */}
+        {activeTab === 'announcements' && (
+          <div className="admin-main-grid">
+            {/* Left Column: Create Announcement */}
+            <div className="admin-card panel-config">
+              <h2>{editingAnnId ? 'Edit Announcement' : 'Publish Announcement'}</h2>
+              <form onSubmit={handleAddAnnouncement} className="admin-form">
+                <div className="form-group">
+                  <label>Announcement Title</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. End Semester Exams schedule released"
+                    value={annTitle}
+                    onChange={(e) => setAnnTitle(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Description / Content</label>
+                  <textarea
+                    rows={4}
+                    placeholder="Provide details about the update..."
+                    value={annContent}
+                    onChange={(e) => setAnnContent(e.target.value)}
+                    style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '10px', color: 'var(--color-text-primary)', width: '100%', resize: 'vertical' }}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Category</label>
+                  <select
+                    value={annCategory}
+                    onChange={(e) => setAnnCategory(e.target.value)}
+                  >
+                    <option value="general">General</option>
+                    <option value="academic">Academic</option>
+                    <option value="society">Societies</option>
+                    <option value="event">Events</option>
+                    <option value="placement">Placements</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>External URL / PDF Link (Optional)</label>
+                  <input
+                    type="url"
+                    placeholder="e.g. https://www.thapar.edu/..."
+                    value={annLink}
+                    onChange={(e) => setAnnLink(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    id="annImportant"
+                    checked={annImportant}
+                    onChange={(e) => setAnnImportant(e.target.checked)}
+                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="annImportant" style={{ marginBottom: 0, cursor: 'pointer' }}>
+                    Mark as Important / Urgent
+                  </label>
+                </div>
+
+                {editingAnnId ? (
+                  <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
+                    <button type="submit" className="btn-primary btn-block btn-submit" style={{ margin: 0, flex: 1 }}>
+                      <Check size={18} />
+                      Save Changes
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={handleCancelEdit} 
+                      className="btn-secondary btn-block" 
+                      style={{ margin: 0, flex: 1 }}
+                    >
+                      <X size={18} />
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button type="submit" className="btn-primary btn-block btn-submit" style={{ marginTop: '16px' }}>
+                    <Plus size={18} />
+                    Publish Update
+                  </button>
+                )}
+              </form>
+            </div>
+
+            {/* Right Column: Manage Announcements */}
+            <div className="admin-card panel-list">
+              <div className="panel-list-header">
+                <h2>Active Announcements</h2>
+                <span className="res-badge gold">{announcements.length} updates</span>
+              </div>
+
+              {announcements.length > 0 ? (
+                <div className="admin-resources-list">
+                  {announcements.map((ann) => (
+                    <div key={ann.id} className="admin-resource-item">
+                      <div className="item-details">
+                        <h3 style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '1rem', fontWeight: '600' }}>
+                          {ann.title}
+                          {ann.important && (
+                            <span className="res-badge text-red" style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.2)', fontSize: '0.7rem', padding: '2px 6px', color: '#f87171', borderRadius: '4px' }}>
+                              Urgent
+                            </span>
+                          )}
+                        </h3>
+                        <div className="item-meta">
+                          <span>
+                            <Calendar size={12} />
+                            {ann.date}
+                          </span>
+                          <span style={{ textTransform: 'capitalize' }}>
+                            <Tag size={12} />
+                            {ann.category}
+                          </span>
+                          {ann.link && (
+                            <a href={ann.link} target="_blank" rel="noopener noreferrer" className="item-link">
+                              <LinkIcon size={12} />
+                              Link
+                              <ExternalLink size={10} />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                      <div className="item-actions">
+                        <button
+                          type="button"
+                          className="btn-edit"
+                          onClick={() => handleStartEditAnnouncement(ann)}
+                          title="Edit announcement"
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-delete"
+                          onClick={() => handleDeleteAnnouncement(ann.id, ann.title)}
+                          title="Delete announcement"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="list-empty-state">
+                  <Bell size={36} />
+                  <p>No active announcements.</p>
+                  <span className="empty-subtext">Publish an update to display it on the campus feed.</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

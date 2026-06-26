@@ -12,6 +12,8 @@ import Campus from './pages/Campus/Campus';
 import Societies from './pages/Societies/Societies';
 import Contribute from './pages/Contribute/Contribute';
 import Admin from './pages/Admin/Admin';
+import Announcements from './pages/Announcements/Announcements';
+import Syllabus from './pages/Syllabus/Syllabus';
 import NotFound from './pages/NotFound/NotFound';
 
 /* ─── App ─────────────────────────────────────────────── */
@@ -31,6 +33,8 @@ export default function App() {
           <Route path="societies" element={<Societies />} />
           <Route path="contribute" element={<Contribute />} />
           <Route path="admin" element={<Admin />} />
+          <Route path="announcements" element={<Announcements />} />
+          <Route path="syllabus" element={<Syllabus />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

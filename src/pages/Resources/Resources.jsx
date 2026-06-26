@@ -28,6 +28,7 @@ import {
 import { resourceTypes } from '../../utils/resourcesData';
 import { getAcademicData } from '../../utils/resourceDb';
 import { getDownloadLink } from '../../utils/helpers';
+import { useLocation } from 'react-router-dom';
 import './Resources.css';
 
 /* ─── Icon maps ─── */
@@ -49,6 +50,8 @@ const typeIcons = {
 export default function Resources() {
   const [academicData, setAcademicData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [selectedSubject, setSelectedSubject] = useState(null);
@@ -60,6 +63,32 @@ export default function Resources() {
       try {
         const data = await getAcademicData();
         setAcademicData(data);
+
+        // Preselect year/branch/subject if passed from routing state
+        if (location.state) {
+          const { yearId, branchId, subjectId } = location.state;
+          if (yearId) {
+            const yearObj = data.find((y) => y.id === yearId);
+            if (yearObj) {
+              setSelectedYear(yearObj);
+              if (branchId) {
+                const branchObj = yearObj.branches.find((b) => b.id === branchId);
+                if (branchObj) {
+                  setSelectedBranch(branchObj);
+                  if (subjectId) {
+                    const subjectObj = branchObj.subjects.find((s) => s.id === subjectId);
+                    if (subjectObj) {
+                      setSelectedSubject(subjectObj);
+                      if (location.state.activeTab) {
+                        setActiveTab(location.state.activeTab);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       } catch (err) {
         console.error('Failed to load resources: ', err);
       } finally {
@@ -67,7 +96,7 @@ export default function Resources() {
       }
     }
     loadData();
-  }, []);
+  }, [location.state]);
 
   // Flat list of subjects for global searching
   const allSubjects = useMemo(() => {

@@ -1,4 +1,4 @@
-/* ─── THAPAR student societies dataset ─── */
+/* ─── THAPAR student societies dataset (Auto-synchronized from API) ─── */
 
 export const societiesData = [
   {
@@ -28,6 +28,25 @@ export const societiesData = [
     ]
   },
   {
+    "id": "69b3c8031047a732f578272c",
+    "title": "AICHE Student Chapter",
+    "description": "AICHE is the world's leading organization for Chemical Engineering professionals, with more than 50,000 members from over 100 countries. The members of the AICHE Student Chapter take part in a wide range of projects and activities aimed at enhancing their college experience and helping each other achieve a more successful career.",
+    "email": "aiche_sc@thapar.edu",
+    "website": "https://aichetiet.wixsite.com/home",
+    "image": "http://thapar.edu/upload/images/AICHE.png",
+    "type": "chapter",
+    "category": "Technical",
+    "presidents": [
+      {
+        "name": "Dr. J.P. Kushwaha",
+        "dept": "Associate Professor, CHED",
+        "email": "jpkushwaha@thapar.edu",
+        "image": "https://www.thapar.edu/webroot/files/faculty/82/150097815982.jpg"
+      }
+    ],
+    "vicePresidents": []
+  },
+  {
     "id": "69b3c8031047a732f5782706",
     "title": "Adventure Club",
     "description": "A forum for adventure enthusiasts, trekkers, climbers and armchair mountaineers in the student community. It works to develop the spirit of adventure in Thaparians. While the stock activities are trekking, rock climbing and mountain cycling, the adventure club has also organized skiing and river rafting sporadically.",
@@ -50,51 +69,6 @@ export const societiesData = [
         "dept": "Assistant Professor, ECED",
         "email": "anil.arora@thapar.edu",
         "image": "http://thapar.edu/upload/images/anilar.jpeg"
-      }
-    ]
-  },
-  {
-    "id": "69b3c8031047a732f578272c",
-    "title": "AICHE Student Chapter",
-    "description": "AICHE is the world's leading organization for Chemical Engineering professionals, with more than 50,000 members from over 100 countries. The members of the AICHE Student Chapter take part in a wide range of projects and activities aimed at enhancing their college experience and helping each other achieve a more successful career.",
-    "email": "aiche_sc@thapar.edu",
-    "website": "https://aichetiet.wixsite.com/home",
-    "image": "http://thapar.edu/upload/images/AICHE.png",
-    "type": "chapter",
-    "category": "Technical",
-    "presidents": [
-      {
-        "name": "Dr. J.P. Kushwaha",
-        "dept": "Associate Professor, CHED",
-        "email": "jpkushwaha@thapar.edu",
-        "image": "https://www.thapar.edu/webroot/files/faculty/82/150097815982.jpg"
-      }
-    ],
-    "vicePresidents": []
-  },
-  {
-    "id": "69b3c8031047a732f578274c",
-    "title": "Chemist's Association for Research and Education Society (CARE)",
-    "description": "To promote the chemical research and education for the benefit of the society. This society encourages students to join the science stream as a career option and provides single platform to students and researchers for their scientific and methodical growth.",
-    "email": "score@thapar.edu",
-    "website": "https://www.ccstiet.com",
-    "image": "https://thapar.edu/upload/images/CARE.jpg",
-    "type": "society",
-    "category": "Technical",
-    "presidents": [
-      {
-        "name": "Dr. Soumen Basu",
-        "dept": "Professor, SCBC",
-        "email": "soumen.basu@thapar.edu",
-        "image": ""
-      }
-    ],
-    "vicePresidents": [
-      {
-        "name": "Dr. Vikas Tyagi",
-        "dept": "Assistant Professor, TSLAS",
-        "email": "vikas.tyagi@thapar.edu",
-        "image": ""
       }
     ]
   },
@@ -125,11 +99,37 @@ export const societiesData = [
     ]
   },
   {
+    "id": "69b3c8031047a732f578274c",
+    "title": "Chemist’s Association for Research and Education Society (CARE)",
+    "description": "To promote the chemical research and education for the benefit of the society. This society encourages students to join the science stream as a career option and provides single platform to students and researchers for their scientific and methodical growth.",
+    "email": "score@thapar.edu",
+    "website": "https://www.ccstiet.com",
+    "image": "https://thapar.edu/upload/images/CARE.jpg",
+    "type": "society",
+    "category": "Technical",
+    "presidents": [
+      {
+        "name": "Dr. Soumen Basu",
+        "dept": "Professor, SCBC",
+        "email": "soumen.basu@thapar.edu",
+        "image": ""
+      }
+    ],
+    "vicePresidents": [
+      {
+        "name": "Dr. Vikas Tyagi",
+        "dept": "Assistant Professor, TSLAS",
+        "email": "vikas.tyagi@thapar.edu",
+        "image": ""
+      }
+    ]
+  },
+  {
     "id": "69b3c8031047a732f578270b",
-    "title": "Dance Club 'NOX'",
-    "description": "Thapar dance club 'NOX' is an excellent platform for the students to augment their dancing skills through workshops conducted by professionally trained choreographers. The students showcase their dancing talents at the various events in the college and also represent the institute in various competitions.",
+    "title": "Dance Club ‘NOX’",
+    "description": "Thapar dance club ‘NOX’ is an excellent platform for the students to augment their dancing skills through workshops conducted by professionally trained choreographers. The students showcase their dancing talents at the various events in the college and also represent the institute in various competitions.",
     "email": "nox@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/images/NOX.jpg",
     "type": "club",
     "category": "Cultural",
@@ -173,6 +173,32 @@ export const societiesData = [
         "dept": "Assistant Professor, CSED",
         "email": "ashima@thapar.edu",
         "image": "https://csed.thapar.edu/files/faculty/322/1505908610322.jpg"
+      }
+    ]
+  },
+  {
+    "id": "69b3c8031047a732f5782755",
+    "title": "ENACTUS",
+    "description": "ENACTUS is a community of students, academic and business leaders committed to using entrepreneurial action to transform lives and shape a better world.",
+    "email": "enactus@thapar.edu",
+    "website": "ENACTUS Website",
+    "image": "https://thapar.edu/upload/images/ENACTUS.jpeg",
+    "type": "society",
+    "category": "Entrepreneurship",
+    "presidents": [
+      {
+        "name": "Dr. Gagandeep Kaur",
+        "dept": "Associate Professor, EIED",
+        "email": "gagandeep@thapar.edu",
+        "image": "https://thapar.edu/upload/images/FeOwezHe_img22(2).jpeg"
+      }
+    ],
+    "vicePresidents": [
+      {
+        "name": "Dr. Ashish Kumar Gupta",
+        "dept": "Assistant Professor, EIED",
+        "email": "ashish.gupta@thapar.edu",
+        "image": ""
       }
     ]
   },
@@ -244,8 +270,8 @@ export const societiesData = [
     "id": "69b3c8031047a732f5782726",
     "title": "Electoral Club",
     "description": "To organize various events and student activities as desired by the Election Commissioner of Punjab/ Deputy Commissioner of Punjab/ Tehsildar Election of Patiala. To encourage young voters about their voting rights through various student activities on campus. To assist students and staff in enrolling and making their voting ID card through an online portal, and participate in competitive events conducted by the Election Commissioner of Punjab.",
-    "email": "",
-    "website": "",
+    "email": null,
+    "website": null,
     "image": "http://thapar.edu/upload/images/electoral_club.png",
     "type": "club",
     "category": "Social",
@@ -263,32 +289,6 @@ export const societiesData = [
         "dept": "Assistant Professor, SHSS",
         "email": "shilpi.tyagi@thapar.edu",
         "image": "https://www.thapar.edu/webroot/files/faculty/374/1506579451374.jpg"
-      }
-    ]
-  },
-  {
-    "id": "69b3c8031047a732f5782755",
-    "title": "ENACTUS",
-    "description": "ENACTUS is a community of students, academic and business leaders committed to using entrepreneurial action to transform lives and shape a better world.",
-    "email": "enactus@thapar.edu",
-    "website": "ENACTUS Website",
-    "image": "https://thapar.edu/upload/images/ENACTUS.jpeg",
-    "type": "society",
-    "category": "Entrepreneurship",
-    "presidents": [
-      {
-        "name": "Dr. Gagandeep Kaur",
-        "dept": "Associate Professor, EIED",
-        "email": "gagandeep@thapar.edu",
-        "image": "https://thapar.edu/upload/images/FeOwezHe_img22(2).jpeg"
-      }
-    ],
-    "vicePresidents": [
-      {
-        "name": "Dr. Ashish Kumar Gupta",
-        "dept": "Assistant Professor, EIED",
-        "email": "ashish.gupta@thapar.edu",
-        "image": ""
       }
     ]
   },
@@ -378,7 +378,7 @@ export const societiesData = [
   },
   {
     "id": "69b3c8031047a732f5782762",
-    "title": "Frosh",
+    "title": "Frosh ",
     "description": "Frosh Society welcomes the first year students in TIET. This society basically involves with all the activities of first year students just after they join institute. Arranging Infodesk, supporting in person counselling and organising orientation program for first year students are the major activities.",
     "email": "frosh@thapar.edu",
     "website": "https://froshtiet.com/",
@@ -427,31 +427,6 @@ export const societiesData = [
     ]
   },
   {
-    "id": "69b3c8031047a732f578271c",
-    "title": "Gender Champions Club",
-    "description": "TIET has taken special initiatives for gender sensitization. It has a Gender Champions Club which looks after the issues pertaining to gender equity in particular. Nodal teachers of this club help in providing overall guidance to the gender champions on various aspects of activity implementation and also collect quarterly reports, assess them, and send it to the head of the institution. The club also conducts training programs so as to motivate, influence, and communicate with different stakeholders.",
-    "email": "gcc@thapar.edu",
-    "website": "",
-    "image": "http://thapar.edu/upload/images/GCC.png",
-    "type": "club",
-    "category": "Social",
-    "presidents": [
-      {
-        "name": "Dr. Deepti Mittal",
-        "dept": "Associate Professor, EIED",
-        "email": "deepti.mittal@thapar.edu",
-        "image": "https://www.thapar.edu/webroot/files/faculty/293/1507865649293.png"
-      },
-      {
-        "name": "Dr. Pramod Kumar Vaishnav",
-        "dept": "Assistant Professor, DoM",
-        "email": "pramod.kumar@thapar.edu",
-        "image": "https://som.thapar.edu/files/faculty/217/1507612443217.jpg"
-      }
-    ],
-    "vicePresidents": []
-  },
-  {
     "id": "69b3c8031047a732f5782769",
     "title": "GENE",
     "description": "GENE Society promotes student's professional development by sponsoring technical activities such as workshops, panel discussions and guest lectures. Furthermore, we offer a variety of educational opportunities in biotechnology, technological advancements, and ethical conduct to encourage continued learning and professional progress. Our Cultural flagship event encourages member's personal, professional and creative development along with celebrating unity in diversity.",
@@ -478,9 +453,34 @@ export const societiesData = [
     ]
   },
   {
+    "id": "69b3c8031047a732f578271c",
+    "title": "Gender Champions Club",
+    "description": "TIET has taken special initiatives for gender sensitization. It has a Gender Champions Club which looks after the issues pertaining to gender equity in particular. Nodal teachers of this club help in providing overall guidance to the gender champions on various aspects of activity implementation and also collect quarterly reports, assess them, and send it to the head of the institution. The club also conducts training programs so as to motivate, influence, and communicate with different stakeholders.",
+    "email": "gcc@thapar.edu",
+    "website": "",
+    "image": "http://thapar.edu/upload/images/GCC.png",
+    "type": "club",
+    "category": "Social",
+    "presidents": [
+      {
+        "name": "Dr. Deepti Mittal",
+        "dept": "Associate Professor, EIED",
+        "email": "deepti.mittal@thapar.edu",
+        "image": "https://www.thapar.edu/webroot/files/faculty/293/1507865649293.png"
+      },
+      {
+        "name": "Dr. Pramod Kumar Vaishnav",
+        "dept": "Assistant Professor, DoM",
+        "email": "pramod.kumar@thapar.edu",
+        "image": "https://som.thapar.edu/files/faculty/217/1507612443217.jpg"
+      }
+    ],
+    "vicePresidents": []
+  },
+  {
     "id": "69b3c8031047a732f578276c",
     "title": "GirlUpTIET Society",
-    "description": "Girl Up is a United Nations Foundation's adolescent girl campaign. This society envisions a world where every girl can reach her full potential and lead the way to bigger dreams, healthier communities and stronger nations. The Girl Up platform exposes girls to issues at the intersection of gender equality, sports and storytelling. This society organizes events that instil social empowerment amongst girls through higher self-confidence, compassion, empathy, social collaboration and civic participation.",
+    "description": "Girl Up is a United Nations Foundation’s adolescent girl campaign. This society envisions a world where every girl can reach her full potential and lead the way to bigger dreams, healthier communities and stronger nations. The Girl Up platform exposes girls to issues at the intersection of gender equality, sports and storytelling. This society organizes events that instil social empowerment amongst girls through higher self-confidence, compassion, empathy, social collaboration and civic participation.",
     "email": "girlup@thapar.edu",
     "website": "https://sites.google.com/thapar.edu/girlup/",
     "image": "http://thapar.edu/upload/images/GIRLUPTIET.png",
@@ -508,7 +508,7 @@ export const societiesData = [
     "title": "Indian Institute Of Chemical Engineers (IICHE)",
     "description": "The IICHE student chapter at TIET organizes various activities like quizzes, group discussions, gaming events, article writing competitions, paper presentations, etc.",
     "email": "iiche@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/images/IICHE.png",
     "type": "chapter",
     "category": "Technical",
@@ -572,7 +572,7 @@ export const societiesData = [
     "title": "Institution of Engineers(India) - Student Chapter (IEI)",
     "description": "IEI (Institution of Engineers, India) organizes various workshops, technical exams, and lecture series by successful individuals in their fields. The society is open to all technical branches of engineering.",
     "email": "iei_sc@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/images/IEI.png",
     "type": "chapter",
     "category": "Technical",
@@ -622,9 +622,9 @@ export const societiesData = [
   {
     "id": "69b3c8031047a732f578272e",
     "title": "International Association of Students In Economics & Business Management (AIESEC) - Patiala Chapter",
-    "description": "AIESEC is an international youth-run non-profit organization present in 130+ countries. AIESEC in Patiala is the local chapter of AIESEC India. AIESEC was started in 1948 to attain peace and fulfillment of humankind's potential through leadership development, achieved through cross-cultural exchanges.",
+    "description": "AIESEC is an international youth-run non-profit organization present in 130+ countries. AIESEC in Patiala is the local chapter of AIESEC India. AIESEC was started in 1948 to attain peace and fulfillment of humankind’s potential through leadership development, achieved through cross-cultural exchanges.",
     "email": "aiesec_sc@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/images/AIESEC.png",
     "type": "chapter",
     "category": "Technical",
@@ -718,9 +718,9 @@ export const societiesData = [
   {
     "id": "69b3c8031047a732f578277e",
     "title": "Mechatronics and Robotics Society (MARS)",
-    "description": "MARS (Mechatronics and Robotics Society) is the official robotics and automation society of Thapar Institute of Engineering and Technology. We specialize in building cutting-edge robotic systems through interdisciplinary collaboration in mechanical, design, control, electronics, and AI. Since 2023, MARS has been proudly representing TIET in the International Rover Challenge (IRC), one of the world's most prestigious robotics competitions. In IRC 2025, we achieved a remarkable 2nd position globally, showcasing our expertise with a fully functional Mars rover prototype designed and built in-house. Beyond competitive robotics, we work on multiple projects ranging from autonomous cleaning robots and robotic arms to warehouse automation systems. Through workshops, mentorship, and hands-on innovation, MARS empowers students to shape the future of robotics and automation.",
+    "description": "MARS (Mechatronics and Robotics Society) is the official robotics and automation society of Thapar Institute of Engineering and Technology. We specialize in building cutting-edge robotic systems through interdisciplinary collaboration in mechanical, design, control, electronics, and AI. Since 2023, MARS has been proudly representing TIET in the International Rover Challenge (IRC), one of the world’s most prestigious robotics competitions. In IRC 2025, we achieved a remarkable 2nd position globally, showcasing our expertise with a fully functional Mars rover prototype designed and built in-house. Beyond competitive robotics, we work on multiple projects ranging from autonomous cleaning robots and robotic arms to warehouse automation systems. Through workshops, mentorship, and hands-on innovation, MARS empowers students to shape the future of robotics and automation.",
     "email": "mars@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "https://thapar.edu/upload/images/Mechatronics%20&%20Robotics1.png",
     "type": "society",
     "category": "Technical",
@@ -765,7 +765,7 @@ export const societiesData = [
     "title": "Music and Dramatic Society (MUDRA)",
     "description": "The objective of this society is to hone the extra-curricular skills of students in the area of Music, Dramatics and developing managerial prowess contributing towards their overall personality. It organizes several big events such as MUDRA night and Izhaar.",
     "email": "mudra@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/images/MUDRA.png",
     "type": "society",
     "category": "Cultural",
@@ -816,7 +816,7 @@ export const societiesData = [
     "category": "Social",
     "presidents": [
       {
-        "name": "Dr. Surya Prakash",
+        "name": "Dr. Surya Prakash  ",
         "dept": "Associate Professor, EIED",
         "email": "surya.prakash@thapar.edu",
         "image": "https://www.thapar.edu/webroot/files/faculty/292/1505886527292.jpg"
@@ -829,7 +829,7 @@ export const societiesData = [
     "title": "OWASP Student Chapter",
     "description": "OWASP Student Chapter aims to provide excellence in network and security, encouraging members to be more digitally secure. The chapter organizes workshops, guest lectures on various fields, and competitions to test knowledge.",
     "email": "owasp_sc@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/images/OWASP.png",
     "type": "chapter",
     "category": "Technical",
@@ -900,7 +900,7 @@ export const societiesData = [
     "title": "ROTARACT CLUB - TIET",
     "description": "Rotaract club's motto is \"Remodeling a better tomorrow,\" where passionate people come together to exchange ideas and tackle communities' most persistent problems. They provide aid to people in need, spread prosperity, and invest in the next generation through organizing activities such as health check-up camps, distributing sanitary napkins in slums, spreading cancer awareness, among others.",
     "email": "rotaractclub_sc@thapar.edu",
-    "website": "",
+    "website": null,
     "image": "http://thapar.edu/upload/files/rot.jpg",
     "type": "chapter",
     "category": "Social",
@@ -924,7 +924,7 @@ export const societiesData = [
   {
     "id": "69b932265969ae61932319b3",
     "title": "Society for Community Engineering (SCE)",
-    "description": "The purpose of \"Society for Community Engineering (SCE)\" is to provide \"Innovative, Sustainable and Affordable Engineering Solutions to Patiala\", wherever creative engineering solutions are required. This is an initiative of the Department of Mechanical Engineering, but students from any stream can join. The students will identify \"problems/need\" in Patiala and will develop innovative engineering solutions (products/prototypes). Students would acquire skills to: 1. Develop creative solutions to complex problems: identify problems, design and develop engineering solutions optimized for sustainability and affordability. 2. Secure innovation through patents, opportunity to develop startups 3. Pitch for fundraising 4. Develop community, alumni and industry network 5. Address national missions such as \"Make in India\" and \"Atmanirbhar Bharat\"",
+    "description": "The purpose of “Society for Community Engineering (SCE)” is to provide “Innovative, Sustainable and Affordable Engineering Solutions to Patiala”, wherever creative engineering solutions are required.\n This is an initiative of the Department of Mechanical Engineering, but students from any stream can join. The students will identify “problems/need” in Patiala and will develop innovative engineering solutions (products/prototypes).\n Students would acquire skills to:\n1. Develop creative solutions to complex problems: identify problems, design and develop engineering solutions optimized for sustainability and affordability.\n2. Secure innovation through patents, opportunity to develop startups\n3. Pitch for fundraising\n4. Develop community, alumni and industry network\n5. Address national missions such as “Make in India” and “Atmanirbhar Bharat”",
     "email": "",
     "website": "",
     "image": "",
@@ -982,7 +982,7 @@ export const societiesData = [
   {
     "id": "69b3c8031047a732f5782745",
     "title": "Society of Automotive Engineers Collegiate Club of TIET",
-    "description": "The objective of the society is to create awareness among students about new technologies in the automotive industry through expert lectures, seminars, workshops, quizzes, industrial visits, and more.SAE Collegiate Club of TIET Club ID: SAEICCNIS077 Automotive Teams under Mechanical Department (a) Team Fateh (b) Team Ultron",
+    "description": "The objective of the society is to create awareness among students about new technologies in the automotive industry through expert lectures, seminars, workshops, quizzes, industrial visits, and more.SAE Collegiate Club of TIET\nClub ID: SAEICCNIS077\nAutomotive Teams under Mechanical Department\n(a) Team Fateh\n(b) Team Ultron\n",
     "email": "sae_sc@thapar.edu",
     "website": "https://www.teamfateh.com/,https://www.ultronmotorsports.com",
     "image": "http://thapar.edu/upload/images/SAELogo.png",
@@ -1008,7 +1008,7 @@ export const societiesData = [
   {
     "id": "69b934c834bb8962eff6cb34",
     "title": "Society of Intelligent Systems (SIS)",
-    "description": "The objectives of SIS are to reflect modern trends by focusing on cutting-edge technologies such as machine learning, deep learning, and large language models, driving innovation in robotics and automation. It broadens society's interdisciplinary focus, fostering collaboration with different domains to drive innovation in intelligent systems and autonomous technologies.",
+    "description": "The objectives of SIS are to reflect modern trends by focusing on cutting-edge technologies such as machine learning, deep learning, and large language models, driving innovation in robotics and automation. It broadens society’s interdisciplinary focus, fostering collaboration with different domains to drive innovation in intelligent systems and autonomous technologies.",
     "email": "sis@thapar.edu",
     "website": "",
     "image": "https://media.licdn.com/dms/image/v2/D560BAQGLeiY0RHCwKQ/company-logo_200_200/B56ZvgRTCWHQAM-/0/1768994191132?e=1775692800&v=beta&t=XpRBOZjHzQLYJW9G1EUnClgxZ1_4j5QjClQujeis9Hk",
@@ -1026,7 +1026,7 @@ export const societiesData = [
   },
   {
     "id": "69b3c8031047a732f578278f",
-    "title": "Spiritual Scientists' Alliance (SSA)",
+    "title": "Spiritual Scientists’ Alliance (SSA)",
     "description": "To impart knowledge and inculcate a way of life which strikes a perfect balance between spiritual peace and rational work ethics. It includes a fest named 'Virsa the essence of Punjab'. Virsa stands for a great culture, a historic way of life. It perfectly depicts how to strike a perfect balance between work, leisure, and spirituality, which is important to lead a healthy, fulfilling life these days & Gurpurab Celebrations.",
     "email": "ssa@thapar.edu",
     "website": "https://sites.google.com/thapar.edu/virsa",
@@ -1070,25 +1070,6 @@ export const societiesData = [
     "vicePresidents": []
   },
   {
-    "id": "69b3c8031047a732f5782792",
-    "title": "Team Oorja",
-    "description": "Team Oorja, a supercharged automotive crew bursting with energy, creativity, and an unquenchable thirst for greatness. We hail from the prestigious Thapar Institute of Engineering and Technology (TIET), where our passion and talent unite. Our team's adventure has been marked by constant expansion and impressive accomplishments, showing our unwavering commitment and tireless drive for greatness.",
-    "email": "team_oorja@thapar.edu",
-    "website": "https://teamoorja.com/",
-    "image": "http://thapar.edu/upload/images/IEI.png",
-    "type": "society",
-    "category": "Technical",
-    "presidents": [
-      {
-        "name": "Dr. Gagandeep Kaur",
-        "dept": "Associate Professor, EIED",
-        "email": "gagandeep@thapar.edu",
-        "image": "http://thapar.edu/upload/images/FeOwezHe_img22(4).jpeg"
-      }
-    ],
-    "vicePresidents": []
-  },
-  {
     "id": "69b3c8031047a732f5782747",
     "title": "TEDx TIET",
     "description": "TEDx TIET aims at bringing the best orators and speakers to the institute platform under the TED initiative. The 20-minute sessions cover social and technical issues and are recorded and uploaded on YouTube and TED links.",
@@ -1103,6 +1084,77 @@ export const societiesData = [
         "dept": "Lecturer, SHSS",
         "email": "navdeep.dhillon@thapar.edu",
         "image": "http://thapar.edu/upload/images/navdeep.png"
+      }
+    ],
+    "vicePresidents": []
+  },
+  {
+    "id": "69b3c8031047a732f5782720",
+    "title": "TIET Fitness Club",
+    "description": "TIET Fitness Club aims to encourage and promote the adoption of professional standards, ethical practice and conduct in the provision of Health and Fitness services. This platform is used to promote the widespread participation of students, staff, and faculty to national initiatives regarding Health and Fitness under the aegis of Fit India Campaign.",
+    "email": "tietfitnessclub@thapar.edu",
+    "website": null,
+    "image": "http://thapar.edu/upload/images/TFC.png",
+    "type": "club",
+    "category": "Sports",
+    "presidents": [
+      {
+        "name": "Dr. Devender Kumar",
+        "dept": "Assistant Professor, MED",
+        "email": "devenderkr@thapar.edu",
+        "image": "http://thapar.edu/upload/images/1544080872223.jpg"
+      }
+    ],
+    "vicePresidents": [
+      {
+        "name": "Dr. Rajendra Kumar",
+        "dept": "Assistant Professor, MED",
+        "email": "rajendra.kumar@thapar.edu",
+        "image": "http://thapar.edu/upload/images/1505829956248.jpg"
+      }
+    ]
+  },
+  {
+    "id": "69b3c8031047a732f5782723",
+    "title": "TU Toastmasters Club",
+    "description": "Thapar Toastmasters Club, a chapter of Toastmasters International, is an organization that helps its members to improve their public speaking, communication, and leadership skills. The club facilitates members to overcome their stage fear, improve communication skills, and become better orators and leaders of tomorrow.",
+    "email": "toastmasters_sc@thapar.edu",
+    "website": "https://sites.google.com/thapar.edu/toastmastersclub/home?authuser=0",
+    "image": "http://thapar.edu/upload/images/Toastmasters.png",
+    "type": "club",
+    "category": "Literary",
+    "presidents": [
+      {
+        "name": "Mr. H.S. Bawa",
+        "dept": "Industrial Coordinator",
+        "email": "hsbawa@thapar.edu",
+        "image": "http://thapar.edu/upload/images/hsbawa.png"
+      }
+    ],
+    "vicePresidents": [
+      {
+        "name": "Dr. Apurva Bakshi",
+        "dept": "Assistant Professor, SHSS",
+        "email": "abakshi@thapar.edu",
+        "image": "http://thapar.edu/upload/images/Apurva_Bakshi.jpeg"
+      }
+    ]
+  },
+  {
+    "id": "69b3c8031047a732f5782792",
+    "title": "Team Oorja",
+    "description": "Team Oorja, a supercharged automotive crew bursting with energy, creativity, and an unquenchable thirst for greatness. We hail from the prestigious Thapar Institute of Engineering and Technology (TIET), where our passion and talent unite. Our team's adventure has been marked by constant expansion and impressive accomplishments, showing our unwavering commitment and tireless drive for greatness.",
+    "email": "team_oorja@thapar.edu",
+    "website": "https://teamoorja.com/",
+    "image": "http://thapar.edu/upload/images/IEI.png",
+    "type": "society",
+    "category": "Technical",
+    "presidents": [
+      {
+        "name": "Dr. Gagandeep Kaur",
+        "dept": "Associate Professor, EIED",
+        "email": "gagandeep@thapar.edu",
+        "image": "http://thapar.edu/upload/images/FeOwezHe_img22(4).jpeg"
       }
     ],
     "vicePresidents": []
@@ -1136,7 +1188,7 @@ export const societiesData = [
   {
     "id": "69bbd7f81b0d820416e2931b",
     "title": "Thapar Electoral Club",
-    "description": "1. To organise various events and student activities as desired by the Election Commissioner of Punjab/ Deputy Commissioner of Punjab/ Tehsildar Election of Patiala. 2. To encourage young voters about their voting rights through various student activities in campus. 3. To assist students and other staff in enrolling and making their voting id card through an online portal. 4. To attend time to time different meetings as conducted by the deputy commissioner's office. 5. To participate in various competitive events as conducted by the Election Commissioner of Punjab. 6. To arrange training facilities for campus ambassadors and nodal officers.",
+    "description": "1. To organise various events and student activities as desired by the Election Commissioner of Punjab/ Deputy Commissioner of Punjab/ Tehsildar Election of Patiala.\n2. To encourage young voters about their voting rights through various student activities in campus. \n3. To assist students and other staff in enrolling and making their voting id card through an online portal. \n4. To attend time to time different meetings as conducted by the deputy commissioner's office. \n5. To participate in various competitive events as conducted by the Election Commissioner of Punjab.\n6. To arrange training facilities for campus ambassadors and nodal officers.  \n",
     "email": "electoralclubthapar@gmail.com",
     "website": "https://electoralclub.vercel.app/",
     "image": "https://electoralclub.vercel.app/logo-192.png",
@@ -1144,7 +1196,7 @@ export const societiesData = [
     "category": "Social",
     "presidents": [
       {
-        "name": "Dr. Rakesh Kumar Sharma",
+        "name": "Dr. Rakesh Kumar Sharma ",
         "dept": "Associate  Professor, SHSS",
         "email": "rakesh.kumar@thapar.edu",
         "image": "https://smss.thapar.edu/files/faculty/176/1505737894176.jpg"
@@ -1298,58 +1350,6 @@ export const societiesData = [
       }
     ],
     "vicePresidents": []
-  },
-  {
-    "id": "69b3c8031047a732f5782720",
-    "title": "TIET Fitness Club",
-    "description": "TIET Fitness Club aims to encourage and promote the adoption of professional standards, ethical practice and conduct in the provision of Health and Fitness services. This platform is used to promote the widespread participation of students, staff, and faculty to national initiatives regarding Health and Fitness under the aegis of Fit India Campaign.",
-    "email": "tietfitnessclub@thapar.edu",
-    "website": "",
-    "image": "http://thapar.edu/upload/images/TFC.png",
-    "type": "club",
-    "category": "Sports",
-    "presidents": [
-      {
-        "name": "Dr. Devender Kumar",
-        "dept": "Assistant Professor, MED",
-        "email": "devenderkr@thapar.edu",
-        "image": "http://thapar.edu/upload/images/1544080872223.jpg"
-      }
-    ],
-    "vicePresidents": [
-      {
-        "name": "Dr. Rajendra Kumar",
-        "dept": "Assistant Professor, MED",
-        "email": "rajendra.kumar@thapar.edu",
-        "image": "http://thapar.edu/upload/images/1505829956248.jpg"
-      }
-    ]
-  },
-  {
-    "id": "69b3c8031047a732f5782723",
-    "title": "TU Toastmasters Club",
-    "description": "Thapar Toastmasters Club, a chapter of Toastmasters International, is an organization that helps its members to improve their public speaking, communication, and leadership skills. The club facilitates members to overcome their stage fear, improve communication skills, and become better orators and leaders of tomorrow.",
-    "email": "toastmasters_sc@thapar.edu",
-    "website": "https://sites.google.com/thapar.edu/toastmastersclub/home?authuser=0",
-    "image": "http://thapar.edu/upload/images/Toastmasters.png",
-    "type": "club",
-    "category": "Literary",
-    "presidents": [
-      {
-        "name": "Mr. H.S. Bawa",
-        "dept": "Industrial Coordinator",
-        "email": "hsbawa@thapar.edu",
-        "image": "http://thapar.edu/upload/images/hsbawa.png"
-      }
-    ],
-    "vicePresidents": [
-      {
-        "name": "Dr. Apurva Bakshi",
-        "dept": "Assistant Professor, SHSS",
-        "email": "abakshi@thapar.edu",
-        "image": "http://thapar.edu/upload/images/Apurva_Bakshi.jpeg"
-      }
-    ]
   },
   {
     "id": "69b3c8031047a732f5782749",

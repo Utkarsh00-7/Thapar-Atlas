@@ -385,6 +385,32 @@ button {
 .item-link:hover {
   color: var(--color-accent);
 }
+.item-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.btn-edit {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.btn-edit:hover {
+  background: #22d3ee;
+  color: #030712;
+  transform: scale(1.05);
+}
 
 .btn-delete {
   background: rgba(239, 68, 68, 0.1);
