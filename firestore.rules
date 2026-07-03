@@ -30,15 +30,15 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // 3. PYQs: Authenticated users can read, only Admins can write
+    // 3. PYQs: Anyone can read, only Admins can write
     match /pyqs/{document} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
-    // 4. Academic Resources: Authenticated users can read, only Admins can write
+    // 4. Academic Resources: Anyone can read, only Admins can write
     match /resources/{document} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
@@ -54,6 +54,12 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
     match /appeals/{document} {
+      allow create: if isThaparStudent();
+      allow read, write: if isAdmin();
+    }
+
+    // 7. Pending Contributions: Authenticated students can create, only Admins can read/manage
+    match /pending_contributions/{document} {
       allow create: if isThaparStudent();
       allow read, write: if isAdmin();
     }
