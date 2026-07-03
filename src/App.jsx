@@ -1,6 +1,10 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useTheme } from './hooks/useTheme';
+import { useAuth } from './context/AuthContext';
 import Layout from './components/layout/Layout';
+import { db } from './utils/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 /* ─── Pages ───────────────────────────────────────────── */
 
@@ -14,12 +18,37 @@ import Contribute from './pages/Contribute/Contribute';
 import Admin from './pages/Admin/Admin';
 import Announcements from './pages/Announcements/Announcements';
 import Syllabus from './pages/Syllabus/Syllabus';
+import Wifi from './pages/Wifi/Wifi';
+import Classrooms from './pages/Classrooms/Classrooms';
+import Feedback from './pages/Feedback/Feedback';
 import NotFound from './pages/NotFound/NotFound';
 
 /* ─── App ─────────────────────────────────────────────── */
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) return;
+
+    async function updateHeartbeat() {
+      try {
+        const userDoc = doc(db, 'students', user.uid);
+        await setDoc(userDoc, {
+          lastActive: Date.now(),
+          displayName: user.displayName || 'Anonymous',
+          email: user.email
+        }, { merge: true });
+      } catch (err) {
+        console.error('Failed to update user activity heartbeat:', err);
+      }
+    }
+
+    updateHeartbeat();
+    const interval = setInterval(updateHeartbeat, 90000); // 1.5 mins
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <BrowserRouter>
@@ -35,6 +64,9 @@ export default function App() {
           <Route path="admin" element={<Admin />} />
           <Route path="announcements" element={<Announcements />} />
           <Route path="syllabus" element={<Syllabus />} />
+          <Route path="wifi" element={<Wifi />} />
+          <Route path="classrooms" element={<Classrooms />} />
+          <Route path="feedback" element={<Feedback />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

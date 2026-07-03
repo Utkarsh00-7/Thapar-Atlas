@@ -5,7 +5,7 @@ import { academicData as templateAcademicData } from './resourcesData';
 const RESOURCES_COLLECTION = 'resources';
 
 /**
- * Seeds the initial mock data from resourcesData.js into Firestore resources collection.
+ * Seeds the initial template data from resourcesData.js into Firestore resources collection.
  */
 async function seedResourcesFromTemplate() {
   try {
@@ -46,7 +46,7 @@ async function seedResourcesFromTemplate() {
     for (const item of batch) {
       await setDoc(doc(db, RESOURCES_COLLECTION, item.id), item);
     }
-    console.log('Seeded Firestore resources successfully.');
+    // Seeded successfully
   } catch (e) {
     console.error('Failed to seed resources template:', e);
   }
@@ -168,7 +168,6 @@ export async function resetDatabase() {
     for (const docSnap of querySnapshot.docs) {
       await deleteDoc(doc(db, RESOURCES_COLLECTION, docSnap.id));
     }
-    console.log('Cleared all resources from database.');
   } catch (e) {
     console.error('Failed to clear resources collection: ', e);
   }

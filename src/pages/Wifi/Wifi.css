@@ -1,0 +1,316 @@
+/* ═══════════════════════════════════════════════════════════════
+   CAMPUS WI-FI PASSWORDS PAGE — Styles
+   Follows the cosmic glassmorphic theme of Thapar Atlas
+   ═══════════════════════════════════════════════════════════════ */
+
+.wifi-page {
+  min-height: calc(100vh - var(--header-height, 68px));
+  padding: var(--space-8) 0 var(--space-20);
+  background: transparent;
+  color: var(--color-text-primary);
+}
+
+.wifi-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* ─── Header Section ─── */
+.wifi-header {
+  margin-bottom: var(--space-2);
+}
+
+.wifi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(34, 211, 238, 0.1);
+  border: 1px solid rgba(34, 211, 238, 0.2);
+  color: var(--color-accent);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-4);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15);
+}
+
+.wifi-header h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  margin-bottom: var(--space-2);
+  background: linear-gradient(135deg, #ffffff 40%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.wifi-header p {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ─── Global Notice Banner ─── */
+.wifi-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: rgba(34, 211, 238, 0.03);
+  border: 1px solid rgba(34, 211, 238, 0.15);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+.notice-icon {
+  margin-top: 2px;
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.notice-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+}
+
+.notice-content strong {
+  color: var(--color-text-primary);
+}
+
+.code-highlight {
+  font-family: var(--font-mono);
+  background: rgba(34, 211, 238, 0.12);
+  color: var(--color-accent);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+/* ─── Search Bar ─── */
+.wifi-search-wrapper {
+  position: relative;
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto var(--space-4) auto;
+}
+
+.wifi-search-input-container {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0 var(--space-4);
+  height: 52px;
+  transition: all var(--transition-base);
+}
+
+.wifi-search-input-container:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.wifi-search-icon {
+  color: var(--color-text-tertiary);
+  margin-right: var(--space-3);
+  flex-shrink: 0;
+}
+
+.wifi-search-wrapper input {
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  width: 100%;
+  height: 100%;
+  outline: none;
+}
+
+.wifi-search-wrapper input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* ─── Networks Grid ─── */
+.wifi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-6);
+  width: 100%;
+}
+
+.wifi-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-5);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.wifi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(800px circle at var(--x, 0px) var(--y, 0px), rgba(34, 211, 238, 0.06), transparent 40%);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.wifi-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(34, 211, 238, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 15px rgba(34, 211, 238, 0.05);
+}
+
+.wifi-card:hover::before {
+  opacity: 1;
+}
+
+.wifi-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-2);
+}
+
+.wifi-card-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.wifi-card-icon {
+  color: var(--color-accent);
+}
+
+.wifi-card h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.wifi-card-note {
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin-bottom: var(--space-5);
+  flex-grow: 1;
+}
+
+.wifi-password-wrap {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-border);
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.wifi-password-label {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.wifi-password-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.wifi-password-text {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+/* Copy Button */
+.wifi-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border-strong);
+  color: var(--color-text-primary);
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.wifi-copy-btn:hover {
+  background: var(--color-accent-subtle);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.wifi-copy-btn.copied {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.4);
+  color: #22c55e;
+}
+
+/* Copied Card Glow State */
+.copied-glow {
+  border-color: rgba(34, 197, 94, 0.45) !important;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.1) !important;
+}
+
+/* ─── Empty & Error States ─── */
+.wifi-empty-state {
+  padding: var(--space-12) var(--space-6);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+}
+
+/* ─── Responsive Adjustments ─── */
+@media (max-width: 768px) {
+  .wifi-page {
+    padding: var(--space-6) 0 var(--space-12);
+  }
+  
+  .wifi-container {
+    padding: 0 var(--space-4);
+    gap: var(--space-4);
+  }
+  
+  .wifi-notice {
+    padding: var(--space-4);
+  }
+}

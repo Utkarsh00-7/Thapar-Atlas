@@ -8,6 +8,8 @@ import {
   FileText,
   Sparkles,
   ClipboardList,
+  Wifi,
+  Search,
 } from 'lucide-react';
 
 /* ─── Grade System (TIET) ─────────────────────────────── */
@@ -80,6 +82,8 @@ export const NAV_ITEMS = [
   { label: 'Resources', path: '/resources', icon: FolderOpen },
   { label: 'PYQ Hub', path: '/pyqs', icon: FileText },
   { label: 'Syllabus', path: '/syllabus', icon: ClipboardList },
+  { label: 'Classroom Finder', path: '/classrooms', icon: Search },
+  { label: 'Wifi Passwords', path: '/wifi', icon: Wifi },
   { label: 'Societies', path: '/societies', icon: Sparkles },
   { label: 'GPA Tools', path: '/gpa', icon: Calculator },
   { label: 'Campus', path: '/campus', icon: MapPin },
@@ -93,10 +97,9 @@ export const FOOTER_NAV = {
   quickLinks: [
     { label: 'Resources', path: '/resources' },
     { label: 'PYQ Hub', path: '/pyqs' },
-    { label: 'Syllabus Tracker', path: '/syllabus' },
-    { label: 'Societies Directory', path: '/societies' },
+    { label: 'Classroom Finder', path: '/classrooms' },
+    { label: 'WiFi Passwords', path: '/wifi' },
     { label: 'GPA Tools', path: '/gpa' },
-    { label: 'Campus Map', path: '/campus' },
     { label: 'Contribute', path: '/contribute' },
   ],
   thaparResources: [

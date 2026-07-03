@@ -9,9 +9,11 @@ export default function Footer() {
 
   const displayedQuickLinks = useMemo(() => {
     const isAdmin = user && user.email && ADMIN_EMAILS.includes(user.email);
-    return isAdmin
-      ? [...FOOTER_NAV.quickLinks, { label: 'Admin Panel', path: '/admin' }]
-      : FOOTER_NAV.quickLinks;
+    let links = [...FOOTER_NAV.quickLinks, { label: 'Feedback', path: '/feedback' }];
+    if (isAdmin) {
+      links.push({ label: 'Admin Panel', path: '/admin' });
+    }
+    return links;
   }, [user]);
   return (
     <footer className="footer">

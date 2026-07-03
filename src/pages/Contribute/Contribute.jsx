@@ -18,6 +18,7 @@ import {
 import { getAcademicData } from '../../utils/resourceDb';
 import { resourceTypes } from '../../utils/resourcesData';
 import { addPendingContribution } from '../../utils/contributionDb';
+import { isActionAllowed, recordAction } from '../../utils/rateLimiter';
 import { useAuth } from '../../context/AuthContext';
 import './Contribute.css';
 
@@ -124,6 +125,19 @@ export default function Contribute() {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Restrict to safe document types (PDFs and standard images)
+    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+    const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg', '.webp'];
+    const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+      setErrorMsg('Invalid file type! Only PDF documents and standard images (PNG, JPEG, WEBP) are allowed.');
+      setSelectedFile(null);
+      setFileName('');
+      setFileSize('');
+      return;
+    }
+
     // Limit size to 10MB
     if (file.size > 10 * 1024 * 1024) {
       setErrorMsg('Direct file upload is limited to 10MB. Please choose the "Shareable Document Link" option for larger files.');
@@ -154,6 +168,13 @@ export default function Contribute() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
+
+    // Check rate limits: 60 seconds cooldown per upload
+    const rateLimit = isActionAllowed('contribute', 60000);
+    if (!rateLimit.allowed) {
+      setErrorMsg(`Please wait ${rateLimit.remainingTime} seconds before uploading another resource to prevent server spam.`);
+      return;
+    }
 
     // Validations
     if (!title.trim()) {
@@ -219,6 +240,19 @@ export default function Contribute() {
         resolvedLink = data.secure_url;
       }
 
+      let fileBase64 = null;
+      let fileMimeType = null;
+      
+      if (uploadMode === 'file' && selectedFile) {
+        fileMimeType = selectedFile.type || 'application/pdf';
+        fileBase64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = (e) => reject(new Error('Failed to read file for moderation check.'));
+          reader.readAsDataURL(selectedFile);
+        });
+      }
+
       const resolvedSize = uploadMode === 'file' ? fileSize : size.trim() || 'Link';
 
       const contribution = {
@@ -235,6 +269,8 @@ export default function Contribute() {
         size: resolvedSize,
         isDirectUpload: uploadMode === 'file',
         fileName: uploadMode === 'file' ? fileName : '',
+        fileBase64,
+        fileMimeType,
         ...(resourceType === 'pyq' && {
           subjectCode: subjectCode.trim().toUpperCase(),
           examType,
@@ -244,6 +280,7 @@ export default function Contribute() {
 
       // Save to pending database
       await addPendingContribution(contribution);
+      recordAction('contribute');
       setSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {

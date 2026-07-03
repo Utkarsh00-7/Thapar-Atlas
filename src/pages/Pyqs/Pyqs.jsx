@@ -23,7 +23,7 @@ export default function Pyqs() {
   const [pyqs, setPyqs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedYear, setSelectedYear] = useState('all'); // 'all', 1, 2, 3, 4
+  const [selectedYear, setSelectedYear] = useState('1'); // 1, 2, 3, 4
   const [selectedExamType, setSelectedExamType] = useState('all'); // 'all', 'MST', 'EST'
   const [selectedPaperYear, setSelectedPaperYear] = useState('all'); // 'all', '2024', '2023', etc.
   const [downloadToast, setDownloadToast] = useState(null);
@@ -234,7 +234,6 @@ export default function Pyqs() {
             <label className="filter-label">Study Year</label>
             <div className="filter-tabs">
               {[
-                { value: 'all', label: 'All Years' },
                 { value: '1', label: '1st Year' },
                 { value: '2', label: '2nd Year' },
                 { value: '3', label: '3rd Year' },

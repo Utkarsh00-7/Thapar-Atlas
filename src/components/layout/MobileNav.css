@@ -24,7 +24,7 @@
   bottom: 0;
   z-index: 201;
   width: min(320px, 85vw);
-  background: var(--color-bg-primary); /* Solid color to prevent text/header overlap */
+  background: #060505 !important; /* Fully opaque background to prevent overlapping text */
   border-left: 1px solid var(--color-border);
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.4);
   transform: translateX(100%);
@@ -32,6 +32,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Restrict scrolling inside the panel wrapper */
+}
+
+[data-theme='light'] .mobile-nav__panel {
+  background: #F8FAFC !important; /* Fully opaque light background */
 }
 
 .mobile-nav__panel.mobile-nav__panel--open {
@@ -300,3 +304,156 @@
   color: var(--color-text-secondary) !important;
   border: 1px solid var(--color-border);
 }
+
+/* ─── Mobile Collapsible Groups ─── */
+.mobile-nav__group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-1);
+}
+
+.mobile-nav__group-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: color 0.15s ease;
+  outline: none;
+  margin-top: var(--space-2);
+}
+
+.mobile-nav__group-trigger:hover {
+  color: var(--color-text-primary);
+}
+
+.mobile-nav__group--active .mobile-nav__group-trigger {
+  color: var(--color-accent);
+}
+
+.mobile-nav__group-arrow {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease, opacity 0.2s ease;
+  opacity: 0.85; /* Highly visible */
+  color: var(--color-text-secondary);
+}
+
+.mobile-nav__group-trigger:hover .mobile-nav__group-arrow {
+  opacity: 1;
+  color: var(--color-text-primary);
+}
+
+.mobile-nav__group--open .mobile-nav__group-arrow {
+  transform: rotate(180deg) scale(1.1); /* Rotate and slightly scale for premium active feedback */
+  opacity: 1;
+  color: var(--color-accent) !important;
+}
+
+/* Sub-items list */
+.mobile-nav__group-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-left: var(--space-3);
+  border-left: 1px dashed var(--color-border);
+  margin-left: var(--space-5);
+  margin-top: 0;
+  margin-bottom: 0;
+  
+  /* Smooth Height and opacity transitions */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: 
+    max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    margin-top 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    margin-bottom 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.mobile-nav__group-items.open {
+  max-height: 380px; /* Comfortably covers all links */
+  opacity: 1;
+  margin-top: 4px;
+  margin-bottom: var(--space-2);
+  pointer-events: auto;
+}
+
+.mobile-nav__group-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 10px var(--space-4);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: all 0.15s ease;
+}
+
+.mobile-nav__group-item svg {
+  color: var(--color-text-tertiary);
+  opacity: 0.8;
+  transition: color 0.15s ease;
+}
+
+.mobile-nav__group-item:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-secondary);
+}
+
+.mobile-nav__group-item:hover svg {
+  color: var(--color-text-primary);
+}
+
+.mobile-nav__group-item.active {
+  color: var(--color-accent);
+  background: var(--color-accent-subtle);
+  font-weight: 600;
+}
+
+.mobile-nav__group-item.active svg {
+  color: var(--color-accent);
+}
+
+/* ─── Mobile Links Stagger Animation ─── */
+@keyframes mobileLinkSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Base state for main items inside drawer links container */
+.mobile-nav__panel .mobile-nav__links > * {
+  opacity: 0;
+}
+
+/* Slide in animation when mobile drawer panel is open */
+.mobile-nav__panel--open .mobile-nav__links > * {
+  animation: mobileLinkSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger delay timings for mobile links */
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(1) { animation-delay: 0.08s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(2) { animation-delay: 0.13s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(3) { animation-delay: 0.18s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(4) { animation-delay: 0.23s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(5) { animation-delay: 0.28s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(6) { animation-delay: 0.33s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(7) { animation-delay: 0.38s; }
+.mobile-nav__panel--open .mobile-nav__links > *:nth-child(8) { animation-delay: 0.43s; }

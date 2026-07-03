@@ -24,7 +24,6 @@ async function seedPyqTemplate() {
         fileName: paper.fileName || ''
       });
     }
-    console.log('Seeded Firestore PYQ database successfully.');
   } catch (e) {
     console.error('Failed to seed PYQ database:', e);
   }
@@ -80,7 +79,6 @@ export async function resetPyqDatabase() {
     for (const docSnap of querySnapshot.docs) {
       await deleteDoc(doc(db, PYQS_COLLECTION, docSnap.id));
     }
-    console.log('Cleared all PYQs from database.');
   } catch (e) {
     console.error('Failed to clear PYQ collection:', e);
   }

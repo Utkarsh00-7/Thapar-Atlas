@@ -1320,25 +1320,6 @@
   opacity: 0.5;
 }
 
-.wireframe--societies {
-  gap: var(--space-2);
-}
-
-.wireframe--societies .wf-list-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2);
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-md);
-}
-
-.wireframe--societies .wf-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex-grow: 1;
-}
 
 .wireframe--showcase .wf-cards {
   display: grid;
@@ -1444,24 +1425,6 @@
   50% { opacity: 1; transform: scale(1.1); }
 }
 
-/* 2. Spotlight / Societies Animation */
-.spotlight-beam-el {
-  transform-origin: 50px 20px;
-  animation: spotlightSweep 3s ease-in-out infinite alternate;
-}
-.spotlight-star {
-  animation: spotlightStarPulse 2s infinite ease-in-out alternate;
-  transform-origin: 50px 71px;
-}
-
-@keyframes spotlightSweep {
-  0% { transform: rotate(-18deg); }
-  100% { transform: rotate(18deg); }
-}
-@keyframes spotlightStarPulse {
-  0% { transform: scale(0.85); opacity: 0.7; }
-  100% { transform: scale(1.1); opacity: 1; }
-}
 
 /* 3. Terminal / Showcase Animation */
 .anim-terminal .term-line-1 {
@@ -1514,6 +1477,58 @@
   animation: radarBlipFade 4s infinite;
 }
 
+/* 5. Bell / Live Calendar Animation */
+.anim-bell {
+  overflow: visible;
+}
+
+.bell-body-el {
+  transform-origin: 50px 15px;
+  animation: bellSwing 2.5s ease-in-out infinite;
+}
+
+.bell-clapper-el {
+  transform-origin: 50px 15px;
+  animation: bellClapperSwing 2.5s ease-in-out infinite;
+}
+
+.bell-wave {
+  transform-origin: 50px 45px;
+  animation: bellWavePulse 2.5s ease-in-out infinite;
+}
+
+.bell-wave-2 {
+  animation-delay: 0.3s;
+}
+
+@keyframes bellSwing {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: rotate(8deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(6deg); }
+  40% { transform: rotate(-6deg); }
+  50% { transform: rotate(3deg); }
+  60% { transform: rotate(-3deg); }
+  70% { transform: rotate(0deg); }
+}
+
+@keyframes bellClapperSwing {
+  0%, 100% { transform: rotate(0deg); }
+  10% { transform: translate(-3px, 0); }
+  20% { transform: translate(3px, 0); }
+  30% { transform: translate(-2px, 0); }
+  40% { transform: translate(2px, 0); }
+  50% { transform: translate(-1px, 0); }
+  60% { transform: translate(1px, 0); }
+  70% { transform: translate(0, 0); }
+}
+
+@keyframes bellWavePulse {
+  0%, 100% { opacity: 0; transform: scale(0.9); }
+  15% { opacity: 1; }
+  35% { opacity: 0; transform: scale(1.15); }
+}
+
 @keyframes radarScan {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
@@ -1523,6 +1538,33 @@
   25% { opacity: 1; }
   60% { opacity: 0; }
   100% { opacity: 0; }
+}
+
+/* 5. Live Calendar Wireframe Simulation */
+.wireframe--live-calendar {
+  gap: var(--space-2) !important;
+}
+
+.wireframe--live-calendar .wf-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  flex-grow: 1;
+  width: 100%;
+}
+
+.wireframe--live-calendar .wf-cal-day {
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-border);
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.wireframe--live-calendar .wf-cal-day--active {
+  background: var(--color-accent);
+  border: none;
+  opacity: 0.4;
 }
 
 /* ─── Media Queries ─── */
@@ -1545,8 +1587,6 @@
   .hero-content,
   .contribute-float,
   .cal-dot,
-  .spotlight-beam-el,
-  .spotlight-star,
   .term-line-1,
   .term-line-2,
   .term-line-3,

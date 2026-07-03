@@ -20,17 +20,7 @@ import { societiesData } from '../../utils/societiesData';
 import './Societies.css';
 
 // Pre-define some popular societies as recruiting for interactive realism
-const RECRUITING_IDS = [
-  '69b3c8031047a732f578274f', // CCS
-  '69b3c8031047a732f5782729', // ACM
-  '69b3c8031047a732f578270e', // DSC
-  '69b3c8031047a732f578270b', // NOX
-  '69b3c8031047a732f5782758', // EDC
-  '69b3c8031047a732f5782755', // ENACTUS
-  '69b3c8031047a732f578275f', // FAPS
-  '69b3c8031047a732f5782711', // Echoes
-  '69b3c8031047a732f578273a', // ISTE
-];
+const RECRUITING_IDS = [];
 
 const CATEGORIES = [
   { id: 'Technical', label: 'Technical', icon: Laptop },

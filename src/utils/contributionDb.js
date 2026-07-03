@@ -3,6 +3,7 @@ import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore'
 import { addResource } from './resourceDb';
 import { addPyq } from './pyqDb';
 import { academicData } from './resourcesData';
+import { checkSubmissionSpam } from './moderationAi';
 
 const PENDING_COLLECTION = 'pending_contributions';
 
@@ -28,14 +29,22 @@ export async function getPendingContributions() {
  */
 export async function addPendingContribution(contribution) {
   try {
+    const { fileBase64, fileMimeType, ...cleanContrib } = contribution;
+    const aiResult = await checkSubmissionSpam(
+      contribution.title,
+      `${contribution.subjectName || ''} ${contribution.fileName || ''}`,
+      fileBase64,
+      fileMimeType
+    );
     const id = `contrib-${Date.now()}`;
     const newContrib = {
       date: new Date().toISOString().split('T')[0],
       downloads: 0,
-      ...contribution,
+      aiFlaggedSpam: aiResult.isSpam,
+      aiSpamReason: aiResult.reason,
+      ...cleanContrib,
     };
     await setDoc(doc(db, PENDING_COLLECTION, id), newContrib);
-    console.log('Saved pending contribution to Firestore.');
   } catch (e) {
     console.error('Failed to save pending contribution in Firestore:', e);
   }
@@ -66,7 +75,8 @@ export async function approveContribution(id) {
         answerUrl: null,
         downloads: 0,
         isDirectUpload: contrib.isDirectUpload || false,
-        fileName: contrib.fileName || ''
+        fileName: contrib.fileName || '',
+        uploadedByEmail: contrib.contributorEmail || null
       };
       await addPyq(newPyq);
     } else {
@@ -81,7 +91,8 @@ export async function approveContribution(id) {
         link: contrib.link || '#',
         uploadedBy: contrib.contributorName || 'Anonymous',
         isDirectUpload: contrib.isDirectUpload || false,
-        fileName: contrib.fileName || ''
+        fileName: contrib.fileName || '',
+        uploadedByEmail: contrib.contributorEmail || null
       };
       
       await addResource(

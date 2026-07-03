@@ -4,6 +4,12 @@ import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
+if (import.meta.env.PROD) {
+  console.log = () => {};
+  console.debug = () => {};
+  console.warn = () => {};
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
@@ -15,7 +21,7 @@ createRoot(document.getElementById('root')).render(
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
-      .then((reg) => console.log('SW Registered', reg))
+      .then(() => {})
       .catch((err) => console.error('SW Registration Failed', err));
   });
 }

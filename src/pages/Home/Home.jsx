@@ -19,13 +19,16 @@ import {
   Search,
   Zap,
   Calendar,
-  Award,
   Terminal,
   Phone,
   LayoutGrid,
   X,
   ClipboardList,
+  CalendarDays,
 } from 'lucide-react';
+import { db } from '../../utils/firebase';
+import { collection, getCountFromServer, getDocs } from 'firebase/firestore';
+import { getSystemConfig } from '../../utils/systemConfig';
 import './Home.css';
 
 /* ───────────────────────── Upcoming Features Data ───────────────────────── */
@@ -38,15 +41,6 @@ const upcomingFeatures = [
     status: 'UNDER DEVELOPMENT',
     statusText: 'Designing scheduling algorithms...',
     animationType: 'calendar',
-  },
-  {
-    icon: Award,
-    title: 'Societies & Fests',
-    description: 'Explore student societies, track recruitment timelines, and register for fests in one central hub.',
-    type: 'societies',
-    status: 'COMING SOON',
-    statusText: 'The team is working on it',
-    animationType: 'spotlight',
   },
   {
     icon: Terminal,
@@ -65,6 +59,15 @@ const upcomingFeatures = [
     status: 'UNDER CONSTRUCTION',
     statusText: 'Compiling campus directories...',
     animationType: 'radar',
+  },
+  {
+    icon: CalendarDays,
+    title: 'Live Events Calendar',
+    description: 'Track upcoming hackathons, workshops, guest lectures, cultural festivals, and society recruitment schedules.',
+    type: 'live-calendar',
+    status: 'COMING SOON',
+    statusText: 'Syncing college calendar data...',
+    animationType: 'live-calendar',
   },
 ];
 
@@ -155,14 +158,6 @@ const quickAccess = [
     bgColor: 'rgba(34, 211, 238, 0.08)',
   },
   {
-    icon: ClipboardList,
-    title: 'Syllabus Tracker',
-    description: 'Track course units, check off topics, and see live progress bars',
-    path: '/syllabus',
-    color: '#EC4899',
-    bgColor: 'rgba(236, 72, 153, 0.08)',
-  },
-  {
     icon: Calculator,
     title: 'GPA Tools',
     description: 'Calculate SGPA, track CGPA, and plan your academic journey',
@@ -205,11 +200,11 @@ const features = [
 ];
 
 /* ───────────────────────── Stats ───────────────────────── */
-const stats = [
-  { value: 500, suffix: '+', label: 'Resources', icon: FileText },
-  { value: 10, suffix: 'K+', label: 'Students', icon: Users },
-  { value: 50, suffix: '+', label: 'Subjects', icon: GraduationCap },
-  { value: 5000, suffix: '+', label: 'Downloads', icon: Download },
+const DEFAULT_STATS = [
+  { key: 'resources', value: 150, suffix: '+', label: 'Resources', icon: FileText },
+  { key: 'students', value: 500, suffix: '+', label: 'Students', icon: Users },
+  { key: 'subjects', value: 40, suffix: '+', label: 'Subjects', icon: GraduationCap },
+  { key: 'downloads', value: 1000, suffix: '+', label: 'Downloads', icon: Download },
 ];
 
 /* ───────────────────────── Card Animation Component ───────────────────────── */
@@ -231,22 +226,17 @@ function CardAnimation({ type }) {
       </svg>
     );
   }
-  if (type === 'spotlight') {
+  if (type === 'live-calendar') {
     return (
-      <svg className="card-anim-svg anim-spotlight" viewBox="0 0 100 100" width="64" height="64">
-        <defs>
-          <linearGradient id="spotlight-beam" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M40,15 L60,15 L55,25 L45,25 Z" fill="var(--color-text-secondary)" />
-        <circle cx="50" cy="15" r="3" fill="var(--color-accent-secondary)" />
-        <polygon points="50,20 15,90 85,90" fill="url(#spotlight-beam)" className="spotlight-beam-el" />
-        <polygon points="50,60 53,67 61,68 55,73 57,81 50,77 43,81 45,73 39,68 47,67" fill="var(--color-accent-secondary)" className="spotlight-star" />
+      <svg className="card-anim-svg anim-bell" viewBox="0 0 100 100" width="64" height="64">
+        <path d="M25,45 A25,25 0 0,1 75,45" fill="none" stroke="var(--color-accent)" strokeWidth="2.5" strokeLinecap="round" className="bell-wave bell-wave-1" />
+        <path d="M15,45 A35,35 0 0,1 85,45" fill="none" stroke="var(--color-accent-secondary)" strokeWidth="2" strokeLinecap="round" className="bell-wave bell-wave-2" />
+        <path d="M50,15 A16,16 0 0,1 66,31 L70,55 A4,4 0 0,0 74,59 L26,59 A4,4 0 0,0 30,55 L34,31 A16,16 0 0,1 50,15 Z" fill="none" stroke="var(--color-text-secondary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="bell-body-el" />
+        <circle cx="50" cy="67" r="5" fill="var(--color-accent)" className="bell-clapper-el" />
       </svg>
     );
   }
+
   if (type === 'terminal') {
     return (
       <svg className="card-anim-svg anim-terminal" viewBox="0 0 100 100" width="64" height="64">
@@ -286,6 +276,8 @@ export default function Home() {
   const [dismissedAnnIds, setDismissedAnnIds] = useState([]);
   const [dismissingAnnIds, setDismissingAnnIds] = useState([]);
 
+  const [stats, setStats] = useState(DEFAULT_STATS);
+
   const handleDismissAnnouncement = (id) => {
     setDismissingAnnIds((prev) => [...prev, id]);
     setTimeout(() => {
@@ -303,6 +295,38 @@ export default function Home() {
         console.error('Failed to fetch announcements:', err);
       } finally {
         setAnnLoading(false);
+      }
+
+      try {
+        const systemConfig = await getSystemConfig();
+        if (systemConfig.useRealtimeStats) {
+          // A. Fetch total students count
+          const studentsColl = collection(db, 'students');
+          const studentsSnapshot = await getCountFromServer(studentsColl);
+          const totalStudents = studentsSnapshot.data().count;
+
+          // B. Fetch total resources count
+          const resourcesColl = collection(db, 'resources');
+          const resourcesSnapshot = await getCountFromServer(resourcesColl);
+          const totalResources = resourcesSnapshot.data().count;
+
+          // C. Fetch all PYQs to sum up downloads
+          const pyqsColl = collection(db, 'pyqs');
+          const pyqSnapshot = await getDocs(pyqsColl);
+          let totalDownloads = 0;
+          pyqSnapshot.forEach((docSnap) => {
+            totalDownloads += docSnap.data().downloads || 0;
+          });
+
+          setStats([
+            { key: 'resources', value: totalResources ?? 0, suffix: '+', label: 'Resources', icon: FileText },
+            { key: 'students', value: totalStudents ?? 0, suffix: '+', label: 'Students', icon: Users },
+            { key: 'subjects', value: 40, suffix: '+', label: 'Subjects', icon: GraduationCap },
+            { key: 'downloads', value: totalDownloads ?? 0, suffix: '+', label: 'Downloads', icon: Download },
+          ]);
+        }
+      } catch (err) {
+        console.error('Failed to load system config or statistics:', err);
       }
     }
     fetchData();
@@ -535,31 +559,7 @@ export default function Home() {
                       </div>
                     )}
 
-                    {item.type === 'societies' && (
-                      <div className="wireframe wireframe--societies">
-                        <div className="wf-list-item">
-                          <div className="wf-circle" />
-                          <div className="wf-stack">
-                            <div className="wf-bar small" />
-                            <div className="wf-bar tiny" />
-                          </div>
-                        </div>
-                        <div className="wf-list-item">
-                          <div className="wf-circle" />
-                          <div className="wf-stack">
-                            <div className="wf-bar small" />
-                            <div className="wf-bar tiny" />
-                          </div>
-                        </div>
-                        <div className="wf-list-item">
-                          <div className="wf-circle" />
-                          <div className="wf-stack">
-                            <div className="wf-bar small" />
-                            <div className="wf-bar tiny" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
+
 
                     {item.type === 'showcase' && (
                       <div className="wireframe wireframe--showcase">
@@ -586,6 +586,25 @@ export default function Home() {
                         <div className="wf-body">
                           <div className="wf-bar small" />
                           <div className="wf-bar medium" />
+                        </div>
+                      </div>
+                    )}
+
+                    {item.type === 'live-calendar' && (
+                      <div className="wireframe wireframe--live-calendar">
+                        <div className="wf-header">
+                          <div className="wf-bar small" />
+                          <div className="wf-bar tiny" />
+                        </div>
+                        <div className="wf-calendar-grid">
+                          <div className="wf-cal-day wf-cal-day--active" />
+                          <div className="wf-cal-day" />
+                          <div className="wf-cal-day" />
+                          <div className="wf-cal-day" />
+                          <div className="wf-cal-day" />
+                          <div className="wf-cal-day wf-cal-day--active" />
+                          <div className="wf-cal-day" />
+                          <div className="wf-cal-day" />
                         </div>
                       </div>
                     )}
