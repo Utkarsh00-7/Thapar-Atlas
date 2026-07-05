@@ -260,6 +260,7 @@ const cseCoeSubjects2ndYear = [
   { id: 'probability-stats', name: 'Probability and Statistics', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
   { id: 'edp2', name: 'Engineering Design Project II', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
   { id: 'aptitude', name: 'Aptitude Skills Building', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
+  { id: 'evolutionary-psychology', name: 'Evolutionary Psychology', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
 ];
 
 const cseCoeSubjects3rdYear = [
@@ -274,6 +275,7 @@ const cseCoeSubjects3rdYear = [
   { id: 'quantum-computing', name: 'Quantum Computing', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
   { id: 'innovation', name: 'Innovation and Entrepreneurship', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
   { id: 'capstone1', name: 'Capstone Project', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
+  { id: 'image-processing', name: 'Image Processing', resources: { notes: [], pyq: [], 'pyq-answer': [], book: [], 'lab-manual': [], youtube: [], tutorial: [], syllabus: [] } },
 ];
 
 const cseCoeSubjects4thYear = [

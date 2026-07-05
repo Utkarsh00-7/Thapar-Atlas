@@ -26,9 +26,9 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
-import { getAcademicData } from '../../utils/resourceDb';
+import { getAcademicData, incrementResourceDownloads } from '../../utils/resourceDb';
 import { getDownloadLink } from '../../utils/helpers';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import './Resources.css';
 
 /* ─── Icon maps ─── */
@@ -51,6 +51,7 @@ export default function Resources() {
   const [academicData, setAcademicData] = useState([]);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedBranch, setSelectedBranch] = useState(null);
@@ -58,35 +59,57 @@ export default function Resources() {
   const [activeTab, setActiveTab] = useState('syllabus');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const handleResourceDownload = async (fileId) => {
+    try {
+      // 1. Increment downloads count in local state
+      setAcademicData(prevData => {
+        return prevData.map(year => {
+          const updatedBranches = year.branches.map(branch => {
+            if (!branch.subjects) return branch;
+            const updatedSubjects = branch.subjects.map(subject => {
+              if (!subject.resources) return subject;
+              const updatedResources = { ...subject.resources };
+              Object.keys(updatedResources).forEach(typeId => {
+                if (Array.isArray(updatedResources[typeId])) {
+                  updatedResources[typeId] = updatedResources[typeId].map(file => {
+                    if (file.id === fileId) {
+                      return { ...file, downloads: (file.downloads || 0) + 1 };
+                    }
+                    return file;
+                  });
+                }
+              });
+              return { ...subject, resources: updatedResources };
+            });
+            return { ...branch, subjects: updatedSubjects };
+          });
+          return { ...year, branches: updatedBranches };
+        });
+      });
+
+      // 2. Persist download increment in Firestore
+      await incrementResourceDownloads(fileId);
+    } catch (e) {
+      console.error('Failed to handle resource download:', e);
+    }
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
         const data = await getAcademicData();
         setAcademicData(data);
 
-        // Preselect year/branch/subject if passed from routing state
-        if (location.state) {
+        // Preselect year/branch/subject if passed from routing state (and no URL parameters are present yet)
+        if (location.state && !searchParams.get('year')) {
           const { yearId, branchId, subjectId } = location.state;
-          if (yearId) {
-            const yearObj = data.find((y) => y.id === yearId);
-            if (yearObj) {
-              setSelectedYear(yearObj);
-              if (branchId) {
-                const branchObj = yearObj.branches.find((b) => b.id === branchId);
-                if (branchObj) {
-                  setSelectedBranch(branchObj);
-                  if (subjectId) {
-                    const subjectObj = branchObj.subjects.find((s) => s.id === subjectId);
-                    if (subjectObj) {
-                      setSelectedSubject(subjectObj);
-                      if (location.state.activeTab) {
-                        setActiveTab(location.state.activeTab);
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          const params = {};
+          if (yearId) params.year = String(yearId);
+          if (branchId) params.branch = branchId;
+          if (subjectId) params.subject = subjectId;
+          setSearchParams(params);
+          if (location.state.activeTab) {
+            setActiveTab(location.state.activeTab);
           }
         }
       } catch (err) {
@@ -97,6 +120,54 @@ export default function Resources() {
     }
     loadData();
   }, [location.state]);
+
+  // Synchronize URL search params to states
+  useEffect(() => {
+    if (academicData.length === 0) return;
+
+    const yearIdParam = searchParams.get('year');
+    const branchIdParam = searchParams.get('branch');
+    const subjectIdParam = searchParams.get('subject');
+
+    if (yearIdParam) {
+      const yearObj = academicData.find(y => String(y.id) === String(yearIdParam));
+      if (yearObj) {
+        setSelectedYear(yearObj);
+        
+        if (branchIdParam) {
+          const branchObj = yearObj.branches.find(b => b.id === branchIdParam);
+          if (branchObj) {
+            setSelectedBranch(branchObj);
+            
+            if (subjectIdParam) {
+              const subjectObj = branchObj.subjects.find(s => s.id === subjectIdParam);
+              if (subjectObj) {
+                setSelectedSubject(subjectObj);
+              } else {
+                setSelectedSubject(null);
+              }
+            } else {
+              setSelectedSubject(null);
+            }
+          } else {
+            setSelectedBranch(null);
+            setSelectedSubject(null);
+          }
+        } else {
+          setSelectedBranch(null);
+          setSelectedSubject(null);
+        }
+      } else {
+        setSelectedYear(null);
+        setSelectedBranch(null);
+        setSelectedSubject(null);
+      }
+    } else {
+      setSelectedYear(null);
+      setSelectedBranch(null);
+      setSelectedSubject(null);
+    }
+  }, [searchParams, academicData]);
 
   // Flat list of subjects for global searching
   const allSubjects = useMemo(() => {
@@ -161,9 +232,11 @@ export default function Resources() {
   }, [allResources, searchQuery]);
 
   const handleSelectMatchingSubject = (subject) => {
-    setSelectedYear(subject.year);
-    setSelectedBranch(subject.branch);
-    setSelectedSubject(subject);
+    setSearchParams({
+      year: String(subject.year.id),
+      branch: subject.branch.id,
+      subject: subject.id
+    });
     setSearchQuery('');
   };
 
@@ -179,35 +252,30 @@ export default function Resources() {
 
   /* ─── Navigation handlers ─── */
   const goToYear = (year) => {
-    setSelectedYear(year);
-    setSelectedBranch(null);
-    setSelectedSubject(null);
+    setSearchParams({ year: String(year.id) });
   };
 
   const goToBranch = (branch) => {
     if (branch.comingSoon) return;
-    setSelectedBranch(branch);
-    setSelectedSubject(null);
+    setSearchParams({ year: String(selectedYear.id), branch: branch.id });
   };
 
   const goToSubject = (subject) => {
-    setSelectedSubject(subject);
+    setSearchParams({ year: String(selectedYear.id), branch: selectedBranch.id, subject: subject.id });
   };
 
   const goBack = () => {
     if (selectedSubject) {
-      setSelectedSubject(null);
+      setSearchParams({ year: String(selectedYear.id), branch: selectedBranch.id });
     } else if (selectedBranch) {
-      setSelectedBranch(null);
+      setSearchParams({ year: String(selectedYear.id) });
     } else if (selectedYear) {
-      setSelectedYear(null);
+      setSearchParams({});
     }
   };
 
   const goHome = () => {
-    setSelectedYear(null);
-    setSelectedBranch(null);
-    setSelectedSubject(null);
+    setSearchParams({});
   };
 
   /* ─── Compute current resources for active tab ─── */
@@ -403,105 +471,108 @@ export default function Resources() {
         {selectedSubject.name}
       </h2>
 
-      {/* Tab Bar */}
-      <div className="resource-tabs" role="tablist">
-        {resourceTypes.map((type) => {
-          const count = selectedSubject.resources?.[type.id]?.length || 0;
-          return (
-            <button
-              key={type.id}
-              className={`resource-tab ${activeTab === type.id ? 'active' : ''}`}
-              onClick={() => setActiveTab(type.id)}
-              role="tab"
-              aria-selected={activeTab === type.id}
-            >
-              {type.label}
-              <span className="resource-tab-count">{count}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* File Listings */}
-      {currentResources.length > 0 ? (
-        <div className="resource-list">
-          {currentResources.map((file) => {
-            const TypeIcon = typeIcons[activeTab] || FileText;
+      <div className="resource-layout-wrapper">
+        {/* Sidebar Tabs */}
+        <aside className="resource-sidebar" role="tablist">
+          {resourceTypes.map((type) => {
+            const count = selectedSubject.resources?.[type.id]?.length || 0;
+            const TabIcon = typeIcons[type.id] || FileText;
             return (
-              <div key={file.id} className="resource-file">
-                <div className="resource-file-icon">
-                  <TypeIcon size={18} />
+              <button
+                key={type.id}
+                className={`resource-tab ${activeTab === type.id ? 'active' : ''}`}
+                onClick={() => setActiveTab(type.id)}
+                role="tab"
+                aria-selected={activeTab === type.id}
+              >
+                <div className="resource-tab-label-group">
+                  <TabIcon size={15} className="tab-icon" />
+                  <span className="tab-label">{type.label}</span>
                 </div>
-                <div className="resource-file-info">
-                  <div className="resource-file-title">{file.title}</div>
-                  <div className="resource-file-meta">
-                    <span>
-                      <Calendar size={12} />
-                      {new Date(file.date).toLocaleDateString('en-IN', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-                    <span>
-                      <HardDrive size={12} />
-                      {file.size}
-                    </span>
-                    {file.downloads > 0 && (
-                      <span>
-                        <Download size={12} />
-                        {file.downloads}
-                      </span>
-                    )}
-                  </div>
+                <div className="resource-tab-meta">
+                  <span className="resource-tab-count">{count}</span>
+                  <ChevronRight size={13} className="tab-arrow" />
                 </div>
-                {file.isDirectUpload ? (
-                  <a
-                    href={getDownloadLink(file.link)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="resource-download-btn"
-                    style={{ textDecoration: 'none' }}
-                  >
-                    <ExternalLink size={14} />
-                    Open
-                  </a>
-                ) : (
-                  <a
-                    href={getDownloadLink(file.link || '#')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="resource-download-btn"
-                    style={{ textDecoration: 'none' }}
-                  >
-                    {file.isLink ? (
-                      <>
-                        <ExternalLink size={14} />
-                        Open
-                      </>
-                    ) : (
-                      <>
-                        <Download size={14} />
-                        Download
-                      </>
-                    )}
-                  </a>
-                )}
-              </div>
+              </button>
             );
           })}
-        </div>
-      ) : (
-        <div className="resource-empty">
-          <FolderOpen size={40} className="resource-empty-icon" />
-          <h3>No resources yet</h3>
-          <p>
-            Be the first to contribute! Upload your{' '}
-            {resourceTypes.find((t) => t.id === activeTab)?.label.toLowerCase() || 'resources'}{' '}
-            for this subject.
-          </p>
-        </div>
-      )}
+        </aside>
+
+        {/* Content Panel */}
+        <section className="resource-content-panel">
+          {currentResources.length > 0 ? (
+            <div className="resource-list">
+              {currentResources.map((file) => {
+                const TypeIcon = typeIcons[activeTab] || FileText;
+                return (
+                  <div key={file.id} className="resource-file">
+                    <div className="resource-file-icon">
+                      <TypeIcon size={18} />
+                    </div>
+                    <div className="resource-file-info">
+                      <div className="resource-file-title">{file.title}</div>
+                      <div className="resource-file-meta">
+                        <span>
+                          <HardDrive size={12} />
+                          {file.size}
+                        </span>
+                        <span>
+                          <Download size={12} />
+                          {file.downloads || 0}
+                        </span>
+                      </div>
+                    </div>
+                    {file.isDirectUpload ? (
+                      <a
+                        href={getDownloadLink(file.link)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="resource-download-btn"
+                        style={{ textDecoration: 'none' }}
+                        onClick={() => handleResourceDownload(file.id)}
+                      >
+                        <ExternalLink size={14} />
+                        Open
+                      </a>
+                    ) : (
+                      <a
+                        href={getDownloadLink(file.link || '#')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="resource-download-btn"
+                        style={{ textDecoration: 'none' }}
+                        onClick={() => handleResourceDownload(file.id)}
+                      >
+                        {file.isLink ? (
+                          <>
+                            <ExternalLink size={14} />
+                            Open
+                          </>
+                        ) : (
+                          <>
+                            <Download size={14} />
+                            Download
+                          </>
+                        )}
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="resource-empty">
+              <FolderOpen size={40} className="resource-empty-icon" />
+              <h3>No resources yet</h3>
+              <p>
+                Be the first to contribute! Upload your{' '}
+                {resourceTypes.find((t) => t.id === activeTab)?.label.toLowerCase() || 'resources'}{' '}
+                for this subject.
+              </p>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 
@@ -607,6 +678,7 @@ export default function Resources() {
                                 rel="noopener noreferrer"
                                 className="resource-download-btn"
                                 style={{ textDecoration: 'none' }}
+                                onClick={() => handleResourceDownload(file.id)}
                               >
                                 <ExternalLink size={14} />
                                 Open
@@ -618,6 +690,7 @@ export default function Resources() {
                                 rel="noopener noreferrer"
                                 className="resource-download-btn"
                                 style={{ textDecoration: 'none' }}
+                                onClick={() => handleResourceDownload(file.id)}
                               >
                                 {file.isLink ? (
                                   <>

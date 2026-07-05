@@ -17,7 +17,8 @@ import {
   Sparkles,
   Calculator,
   MapPin,
-  Upload
+  Upload,
+  Bell
 } from 'lucide-react';
 import { NAV_ITEMS, ADMIN_EMAILS } from '../../utils/constants';
 import { cn } from '../../utils/helpers';
@@ -61,6 +62,12 @@ export default function MobileNav({ isOpen, onClose, theme, toggleTheme }) {
         label: 'Home',
         path: '/',
         icon: Home
+      },
+      {
+        type: 'link',
+        label: 'Announcements',
+        path: '/announcements',
+        icon: Bell
       },
       {
         type: 'dropdown',

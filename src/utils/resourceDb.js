@@ -1,6 +1,7 @@
 import { db } from './firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { academicData as templateAcademicData } from './resourcesData';
+import { getPyqData, incrementPyqDownloads } from './pyqDb';
 
 const RESOURCES_COLLECTION = 'resources';
 
@@ -100,6 +101,142 @@ export async function getAcademicData() {
       }
     });
 
+    // NOW dynamically match and append all subject previous year papers (PYQs)
+    try {
+      const pyqs = await getPyqData();
+      
+      const SUBJECT_CODES = {
+        'calculus': ['UMA022', 'UMA003', 'UMA001'],
+        'chemistry-a': ['UCB009', 'UCB001', 'UCB008', 'UCB010'],
+        'eee': ['UES013', 'UES003', 'UES004'],
+        'energy-env-a': ['UEN008', 'UEN002'],
+        'pps-a': ['UES103', 'UTA007', 'UTA017'],
+        'dela': ['UMA023', 'UMA002', 'UMA007'],
+        'ed-b': ['UES101', 'UES104'],
+        'mp': ['UES102', 'UES132'],
+        'physics-b': ['UPH013', 'UPH004', 'UPH009'],
+        'procomm-b': ['UHU003', 'UHU001', 'UHU081'],
+        'os': ['UCS303', 'UCS401', 'UCS507'],
+        'oop': ['UTA018', 'UTA002', 'UTA012'],
+        'ds': ['UCS301', 'UCS402', 'UCS302'],
+        'discrete': ['UCS405', 'UMA004'],
+        'edp1': ['UTA016'],
+        'nla': ['UMA021'],
+        'green-computing': ['UCS320'],
+        'algo': ['UCS415', 'UCS403', 'UCS501'],
+        'dbms': ['UCS310', 'UCS404', 'UCS502'],
+        'networks': ['UCS414', 'UCS613'],
+        'ai-eng': ['UCS411', 'UCS321'],
+        'probability-stats': ['UMA401', 'UMA402'],
+        'edp2': ['UTA024'],
+        'aptitude': ['UTD003'],
+        'ml': ['UML501', 'UCS608', 'UCS616'],
+        'cognitive': ['UCS420'],
+        'web-app': ['UCS553', 'UCS606'],
+        'se': ['UCS503', 'UCS408'],
+        'cao': ['UCS510', 'UCS406'],
+        'ethics-ai': ['UCS421'],
+        'toc': ['UCS701', 'UCS505', 'UCS601'],
+        'optimization': ['UMA035', 'UMA071'],
+        'quantum-computing': ['UCS619'],
+        'innovation': ['UTA025'],
+        'capstone1': ['UCS797'],
+        'compiler': ['UCS802', 'UCS602', 'UCS614'],
+        'humanities': ['UHU005', 'UHU002'],
+        'agentic-ai': ['UCS714'],
+        'sna': ['UCS813'],
+        'ethical-hacking': ['UCS806'],
+        'image-processing': ['UCS615', 'UCS605'],
+        'evolutionary-psychology': ['UHU050']
+      };
+
+      const CLEAN_CODES = {};
+      Object.keys(SUBJECT_CODES).forEach(key => {
+        CLEAN_CODES[key] = SUBJECT_CODES[key].map(c => c.toLowerCase().trim());
+      });
+
+      const cleanStr = (str) => (str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+      pyqs.forEach(paper => {
+        const paperName = cleanStr(paper.subjectName);
+        const paperCode = (paper.subjectCode || '').toLowerCase().trim();
+        
+        // Find matching subject in clonedData
+        let matchedSubject = null;
+        
+        // 1. Try Code-first matching using historical/alternative codes
+        clonedData.forEach(year => {
+          year.branches.forEach(branch => {
+            if (branch.subjects) {
+              branch.subjects.forEach(subj => {
+                const sId = subj.id;
+                if (CLEAN_CODES[sId] && CLEAN_CODES[sId].includes(paperCode)) {
+                  matchedSubject = subj;
+                }
+              });
+            }
+          });
+        });
+
+        // 2. Fall back to name-first matching if code didn't resolve
+        if (!matchedSubject) {
+          clonedData.forEach(year => {
+            year.branches.forEach(branch => {
+              if (branch.subjects) {
+                branch.subjects.forEach(subj => {
+                  const subjName = cleanStr(subj.name);
+                  const isMatch = (
+                    paperName === subjName ||
+                    subjName.includes(paperName) ||
+                    paperName.includes(subjName)
+                  );
+                  if (isMatch) {
+                    matchedSubject = subj;
+                  }
+                });
+              }
+            });
+          });
+        }
+
+        if (matchedSubject) {
+          // Construct resource-compatible object for the Question Paper
+          const pyqItem = {
+            id: `${paper.id}-paper`,
+            title: `${paper.examType} ${paper.paperYear} Paper (${paper.subjectCode || 'General'})`,
+            uploadedBy: 'Curated',
+            date: `${paper.paperYear}-06-15`, // Default to mid-year of the paper
+            size: 'PDF',
+            downloads: paper.downloads || 0,
+            isLink: false,
+            link: paper.fileUrl,
+            isDirectUpload: paper.isDirectUpload || false,
+            fileName: paper.fileName || ''
+          };
+          matchedSubject.resources.pyq.push(pyqItem);
+
+          // If there is an answer key URL, construct and push a resource-compatible object for it
+          if (paper.answerUrl && paper.answerUrl.trim() !== '' && paper.answerUrl !== '#') {
+            const answerItem = {
+              id: `${paper.id}-answer`,
+              title: `${paper.examType} ${paper.paperYear} Answer Key (${paper.subjectCode || 'General'})`,
+              uploadedBy: 'Curated',
+              date: `${paper.paperYear}-06-15`,
+              size: 'PDF',
+              downloads: 0,
+              isLink: false,
+              link: paper.answerUrl,
+              isDirectUpload: false,
+              fileName: ''
+            };
+            matchedSubject.resources['pyq-answer'].push(answerItem);
+          }
+        }
+      });
+    } catch (pyqErr) {
+      console.error('Failed to load and inject PYQs into academic resources:', pyqErr);
+    }
+
     return clonedData;
   } catch (e) {
     console.error('Failed to fetch academic resources from Firestore, returning empty template:', e);
@@ -180,3 +317,28 @@ export async function resetDatabase() {
 export function exportAsJSCode() {
   return `// We have migrated to Firebase. All changes are saved in real-time to Firestore.`;
 }
+
+/**
+ * Increments the download count of a specific academic resource document in Firestore.
+ */
+export async function incrementResourceDownloads(id) {
+  try {
+    if (id.endsWith('-paper')) {
+      const realPyqId = id.replace('-paper', '');
+      await incrementPyqDownloads(realPyqId);
+      return;
+    }
+    if (id.endsWith('-answer')) {
+      const realPyqId = id.replace('-answer', '');
+      await incrementPyqDownloads(realPyqId);
+      return;
+    }
+    const docRef = doc(db, RESOURCES_COLLECTION, id);
+    await updateDoc(docRef, {
+      downloads: increment(1)
+    });
+  } catch (e) {
+    console.error('Failed to increment resource downloads in Firestore:', e);
+  }
+}
+

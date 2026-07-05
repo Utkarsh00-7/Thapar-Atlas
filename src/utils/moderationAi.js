@@ -117,8 +117,10 @@ export async function verifyStudentIdCard(studentDetails, fileBase64, fileMimeTy
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     
     const prompt = `You are an AI registrar assistant for Thapar Institute of Engineering and Technology.
-Verify if the uploaded image is a valid Thapar student ID card, and check if the details on it match the user's input profile:
+Extract the student details from the uploaded Thapar student ID card image and return them.
+Also verify if the uploaded image is a valid Thapar student ID card. If the user's input profile details are provided, check if they match.
 
+Input profile details (if any):
 Name: "${studentDetails.name || ''}"
 Roll Number: "${studentDetails.rollNumber || ''}"
 Branch: "${studentDetails.branch || ''}"
@@ -127,7 +129,14 @@ Analyze the image carefully.
 Respond in JSON format with this exact structure:
 {
   "verified": true or false,
-  "reason": "A brief explanation of your decision (e.g. details match, image blur, incorrect ID card)"
+  "reason": "A brief explanation of your decision (e.g. details match, image blur, incorrect ID card)",
+  "extractedDetails": {
+    "name": "Extracted student full name (in Title Case)",
+    "rollNumber": "Extracted roll number (numeric string, e.g. 1025030136)",
+    "branch": "Extracted branch code (must be one of: COE, CSE, ENC, ELC, EE, ME, CE, CHE, BIOT)",
+    "year": "Extracted study year based on enrollment/roll number or card detail (must be one of: '1', '2', '3', '4')",
+    "subgroup": "Extracted subgroup/group (e.g. 1A27, 2A2, etc. if present on card, otherwise empty)"
+  }
 }`;
 
     const parts = [
@@ -176,13 +185,15 @@ Respond in JSON format with this exact structure:
     const result = JSON.parse(responseText.trim());
     return {
       verified: !!result.verified,
-      reason: result.reason || 'Verification complete'
+      reason: result.reason || 'Verification complete',
+      extractedDetails: result.extractedDetails || null
     };
   } catch (error) {
     console.error('AI ID verification error:', error);
     return {
       verified: false,
-      reason: `AI check failed: ${error.message}`
+      reason: `AI check failed: ${error.message}`,
+      extractedDetails: null
     };
   }
 }

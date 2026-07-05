@@ -1,16 +1,15 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 
-const PROFILES_COLLECTION = 'student_profiles';
+const PROFILES_COLLECTION = 'students';
 
 /**
- * Retrieves a student's profile by email.
+ * Retrieves a student's profile by Firebase Auth UID.
  */
-export async function getStudentProfile(email) {
+export async function getStudentProfile(uid) {
   try {
-    if (!email) return null;
-    const id = email.replace(/[^a-zA-Z0-9]/g, '_');
-    const docRef = doc(db, PROFILES_COLLECTION, id);
+    if (!uid) return null;
+    const docRef = doc(db, PROFILES_COLLECTION, uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       return docSnap.data();
@@ -22,14 +21,14 @@ export async function getStudentProfile(email) {
 }
 
 /**
- * Saves/updates a student's profile in Firestore.
+ * Saves/updates a student's profile in Firestore using UID as document ID.
  */
-export async function saveStudentProfile(email, profileData) {
+export async function saveStudentProfile(uid, email, profileData) {
   try {
-    if (!email) throw new Error('Email is required');
-    const id = email.replace(/[^a-zA-Z0-9]/g, '_');
-    const docRef = doc(db, PROFILES_COLLECTION, id);
+    if (!uid) throw new Error('UID is required');
+    const docRef = doc(db, PROFILES_COLLECTION, uid);
     const data = {
+      uid,
       email,
       updatedAt: Date.now(),
       ...profileData

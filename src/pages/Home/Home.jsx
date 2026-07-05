@@ -310,11 +310,15 @@ export default function Home() {
           const resourcesSnapshot = await getCountFromServer(resourcesColl);
           const totalResources = resourcesSnapshot.data().count;
 
-          // C. Fetch all PYQs to sum up downloads
-          const pyqsColl = collection(db, 'pyqs');
-          const pyqSnapshot = await getDocs(pyqsColl);
+          // C. Fetch all PYQs and resources to sum up downloads
           let totalDownloads = 0;
+          const pyqSnapshot = await getDocs(collection(db, 'pyqs'));
           pyqSnapshot.forEach((docSnap) => {
+            totalDownloads += docSnap.data().downloads || 0;
+          });
+
+          const resSnapshot = await getDocs(collection(db, 'resources'));
+          resSnapshot.forEach((docSnap) => {
             totalDownloads += docSnap.data().downloads || 0;
           });
 
@@ -324,9 +328,11 @@ export default function Home() {
             { key: 'subjects', value: 40, suffix: '+', label: 'Subjects', icon: GraduationCap },
             { key: 'downloads', value: totalDownloads ?? 0, suffix: '+', label: 'Downloads', icon: Download },
           ]);
+        } else {
+          setStats(DEFAULT_STATS);
         }
       } catch (err) {
-        console.error('Failed to load system config or statistics:', err);
+        console.error('Failed to load statistics:', err);
       }
     }
     fetchData();

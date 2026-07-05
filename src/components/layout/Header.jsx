@@ -23,7 +23,8 @@ import {
   X,
   CheckCircle,
   BadgeCheck,
-  AlertTriangle
+  AlertTriangle,
+  Bell
 } from 'lucide-react';
 import { NAV_ITEMS, ADMIN_EMAILS } from '../../utils/constants';
 import { cn } from '../../utils/helpers';
@@ -122,7 +123,7 @@ export default function Header({ theme, toggleTheme }) {
       if (user) {
         setProfileLoading(true);
         try {
-          const prof = await getStudentProfile(user.email);
+          const prof = await getStudentProfile(user.uid);
           if (prof) {
             setCurrentUserProfile(prof);
             setStudentProfile({
@@ -178,8 +179,14 @@ export default function Header({ theme, toggleTheme }) {
       try {
         const result = await verifyStudentIdCard(studentProfile, base64, file.type);
         setIdVerifyStatus(result);
+        const extracted = result.extractedDetails || {};
         setStudentProfile(prev => ({
           ...prev,
+          name: extracted.name || prev.name,
+          rollNumber: extracted.rollNumber || prev.rollNumber,
+          branch: extracted.branch || prev.branch,
+          year: extracted.year || prev.year,
+          subgroup: extracted.subgroup || prev.subgroup,
           isVerified: !!result.verified,
           verificationReason: result.reason || ''
         }));
@@ -197,7 +204,7 @@ export default function Header({ theme, toggleTheme }) {
     if (!user) return;
     setProfileSaving(true);
     try {
-      const savedData = await saveStudentProfile(user.email, studentProfile);
+      const savedData = await saveStudentProfile(user.uid, user.email, studentProfile);
       setCurrentUserProfile(savedData);
       alert('Profile details saved successfully!');
       setProfileModalOpen(false);
@@ -446,6 +453,14 @@ export default function Header({ theme, toggleTheme }) {
           <div className="header__actions">
             {/* Unified glass actions container */}
             <div className="header__actions-glass">
+              <Link 
+                to="/announcements" 
+                className="header__action-btn header__bell-btn"
+                title="Announcements"
+                style={{ display: 'inline-flex' }}
+              >
+                <Bell size={16} />
+              </Link>
 
               {loading ? (
                 <button className="header__action-btn header__sign-in-pill header__sign-in-pill--loading" disabled type="button">

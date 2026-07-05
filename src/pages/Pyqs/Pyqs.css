@@ -157,6 +157,11 @@
   color: #f87171;
 }
 
+.stat-icon-wrapper.blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
 .stat-icon {
   width: 24px;
   height: 24px;
@@ -830,3 +835,98 @@
   color: var(--color-text-secondary);
   font-size: 0.95rem;
 }
+
+/* ─── College Dual Search Layout ─── */
+.college-search-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.college-search-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.college-search-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+.search-separator {
+  color: var(--color-text-tertiary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0 var(--space-2);
+  align-self: flex-end;
+  margin-bottom: var(--space-3);
+}
+
+@media (max-width: 768px) {
+  .college-search-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+  }
+  .search-separator {
+    align-self: center;
+    margin-bottom: 0;
+    font-size: 0.75rem;
+    position: relative;
+    padding: var(--space-1) 0;
+  }
+  .search-separator::before,
+  .search-separator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40px;
+    height: 1px;
+    background: var(--color-border);
+  }
+  .search-separator::before {
+    right: 100%;
+    margin-right: 10px;
+  }
+  .search-separator::after {
+    left: 100%;
+    margin-left: 10px;
+  }
+}
+
+/* ─── Search Button and Placeholders ─── */
+.search-action-row {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-6);
+  width: 100%;
+}
+
+.btn-search-pyqs {
+  padding: var(--space-3) var(--space-8);
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pyq-search-placeholder {
+  background: var(--color-bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-12) var(--space-6) !important;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-glass);
+}
+

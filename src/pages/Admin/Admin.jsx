@@ -1232,7 +1232,7 @@ export default function Admin() {
                             <td>
                               <button 
                                 className="btn-icon-action btn-delete" 
-                                onClick={() => handleDeletePyq(paper.id)}
+                                onClick={() => handleDeletePyqItem(paper.id, paper.subjectCode, paper.examType)}
                                 title="Delete paper"
                               >
                                 <Trash2 size={13} />

@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { pyqData as initialPyqData } from './pyqData';
 
 const PYQS_COLLECTION = 'pyqs';
@@ -84,3 +84,18 @@ export async function resetPyqDatabase() {
   }
   return getPyqData();
 }
+
+/**
+ * Increments the download count of a specific PYQ paper in Firestore.
+ */
+export async function incrementPyqDownloads(id) {
+  try {
+    const docRef = doc(db, PYQS_COLLECTION, id);
+    await updateDoc(docRef, {
+      downloads: increment(1)
+    });
+  } catch (e) {
+    console.error('Failed to increment PYQ downloads in Firestore:', e);
+  }
+}
+

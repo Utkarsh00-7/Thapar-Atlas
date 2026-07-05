@@ -13,7 +13,7 @@ import {
   X,
   FileCheck,
 } from 'lucide-react';
-import { getPyqData } from '../../utils/pyqDb';
+import { getPyqData, incrementPyqDownloads } from '../../utils/pyqDb';
 import { getDownloadLink } from '../../utils/helpers';
 import './Pyqs.css';
 
@@ -22,10 +22,18 @@ export default function Pyqs() {
 
   const [pyqs, setPyqs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedYear, setSelectedYear] = useState('1'); // 1, 2, 3, 4
-  const [selectedExamType, setSelectedExamType] = useState('all'); // 'all', 'MST', 'EST'
-  const [selectedPaperYear, setSelectedPaperYear] = useState('all'); // 'all', '2024', '2023', etc.
+  const [draftCcode, setDraftCcode] = useState('');
+  const [draftCname, setDraftCname] = useState('');
+  const [draftYear, setDraftYear] = useState('1'); // '1', '2', '3', '4'
+  const [draftExamType, setDraftExamType] = useState('all'); // 'all', 'MST', 'EST', 'AUX'
+  const [draftPaperYear, setDraftPaperYear] = useState('all'); // 'all', '2024', etc.
+
+  const [activeCcode, setActiveCcode] = useState('');
+  const [activeCname, setActiveCname] = useState('');
+  const [activeYear, setActiveYear] = useState('1');
+  const [activeExamType, setActiveExamType] = useState('all');
+  const [activePaperYear, setActivePaperYear] = useState('all');
+  const [hasSearched, setHasSearched] = useState(false);
   const [downloadToast, setDownloadToast] = useState(null);
 
   useEffect(() => {
@@ -36,11 +44,26 @@ export default function Pyqs() {
 
         // Prepopulate filter state from router state if redirecting from Syllabus Tracker
         if (location.state) {
+          let stateFound = false;
           if (location.state.searchQuery) {
-            setSearchQuery(location.state.searchQuery);
+            const query = location.state.searchQuery;
+            if (/^[A-Z]{3,4}\d{3}$/i.test(query)) {
+              setDraftCcode(query);
+              setActiveCcode(query);
+            } else {
+              setDraftCname(query);
+              setActiveCname(query);
+            }
+            stateFound = true;
           }
           if (location.state.selectedYear) {
-            setSelectedYear(String(location.state.selectedYear));
+            const y = String(location.state.selectedYear);
+            setDraftYear(y);
+            setActiveYear(y);
+            stateFound = true;
+          }
+          if (stateFound) {
+            setHasSearched(true);
           }
         }
       } catch (err) {
@@ -54,43 +77,38 @@ export default function Pyqs() {
 
   // Generate unique paper years for filter dropdown
   const paperYears = useMemo(() => {
-    const years = pyqs.map(p => p.paperYear);
+    const years = pyqs
+      .map(p => p.paperYear)
+      .filter(y => y && /^\d{4}$/.test(String(y)));
     return ['all', ...new Set(years)].sort((a, b) => b.localeCompare(a));
   }, [pyqs]);
 
-  // Filter logic
-  const filteredPapers = useMemo(() => {
+  // Base filtered list (ignores exam type filter for stats calculation)
+  const baseFiltered = useMemo(() => {
     return pyqs.filter(paper => {
-      // Search matches subject name or code
-      const matchesSearch =
-        paper.subjectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        paper.subjectCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        paper.branch.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Year matches study year
-      const matchesYear =
-        selectedYear === 'all' || paper.studyYear === Number(selectedYear);
-
-      // Exam type matches
-      const matchesExam =
-        selectedExamType === 'all' || paper.examType === selectedExamType;
-
-      // Paper year matches
-      const matchesPaperYear =
-        selectedPaperYear === 'all' || paper.paperYear === selectedPaperYear;
-
-      return matchesSearch && matchesYear && matchesExam && matchesPaperYear;
+      const matchesCcode = !activeCcode || paper.subjectCode.toLowerCase().includes(activeCcode.toLowerCase());
+      const matchesCname = !activeCname || paper.subjectName.toLowerCase().includes(activeCname.toLowerCase());
+      const matchesYear = activeYear === 'all' || paper.studyYear === Number(activeYear);
+      const matchesPaperYear = activePaperYear === 'all' || paper.paperYear === activePaperYear;
+      return matchesCcode && matchesCname && matchesYear && matchesPaperYear;
     });
-  }, [pyqs, searchQuery, selectedYear, selectedExamType, selectedPaperYear]);
+  }, [pyqs, activeCcode, activeCname, activeYear, activePaperYear]);
+
+  // Filter logic (applies exam type filter as well)
+  const filteredPapers = useMemo(() => {
+    return baseFiltered.filter(paper => {
+      return activeExamType === 'all' || paper.examType === activeExamType;
+    });
+  }, [baseFiltered, activeExamType]);
 
   // Statistics
   const stats = useMemo(() => {
     const total = filteredPapers.length;
-    const msts = filteredPapers.filter(p => p.examType === 'MST').length;
-    const ests = filteredPapers.filter(p => p.examType === 'EST').length;
-    const totalDownloads = filteredPapers.reduce((sum, p) => sum + (p.downloads || 0), 0);
-    return { total, msts, ests, totalDownloads };
-  }, [filteredPapers]);
+    const msts = baseFiltered.filter(p => p.examType === 'MST' || p.examType === 'SUMMER (MST)').length;
+    const ests = baseFiltered.filter(p => p.examType === 'EST' || p.examType === 'SUMMER (EST)').length;
+    const auxs = baseFiltered.filter(p => p.examType === 'AUX').length;
+    return { total, msts, ests, auxs };
+  }, [filteredPapers, baseFiltered]);
 
   const handleDownload = (id, subjectCode, examType, isAnswerKey = false) => {
     const paperObj = pyqs.find(p => p.id === id);
@@ -103,6 +121,9 @@ export default function Pyqs() {
       localStorage.setItem('thapar_atlas_pyqs', JSON.stringify(updated));
       return updated;
     });
+
+    // Record the download count in Firestore database
+    incrementPyqDownloads(id);
 
     // Handle real direct file downloads vs opening external links
     if (paperObj) {
@@ -125,11 +146,29 @@ export default function Pyqs() {
     }, 3000);
   };
 
+  const handleSearchSubmit = (e) => {
+    if (e) e.preventDefault();
+    setActiveCcode(draftCcode);
+    setActiveCname(draftCname);
+    setActiveYear(draftYear);
+    setActiveExamType(draftExamType);
+    setActivePaperYear(draftPaperYear);
+    setHasSearched(true);
+  };
+
   const handleResetFilters = () => {
-    setSearchQuery('');
-    setSelectedYear('all');
-    setSelectedExamType('all');
-    setSelectedPaperYear('all');
+    setDraftCcode('');
+    setDraftCname('');
+    setDraftYear('1');
+    setDraftExamType('all');
+    setDraftPaperYear('all');
+
+    setActiveCcode('');
+    setActiveCname('');
+    setActiveYear('1');
+    setActiveExamType('all');
+    setActivePaperYear('all');
+    setHasSearched(false);
   };
 
   return (
@@ -168,64 +207,96 @@ export default function Pyqs() {
       </header>
 
       {/* Quick Stats Grid */}
-      <section className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-icon-wrapper cyan">
-            <BookOpen className="stat-icon" />
+      {hasSearched && (
+        <section className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon-wrapper cyan">
+              <BookOpen className="stat-icon" />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Matching Papers</span>
+              <span className="stat-value">{stats.total}</span>
+            </div>
           </div>
-          <div className="stat-info">
-            <span className="stat-label">Matching Papers</span>
-            <span className="stat-value">{stats.total}</span>
-          </div>
-        </div>
 
-        <div className="stat-card">
-          <div className="stat-icon-wrapper purple">
-            <FileText className="stat-icon" />
+          <div className="stat-card">
+            <div className="stat-icon-wrapper purple">
+              <FileText className="stat-icon" />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Mid-Sem (MST)</span>
+              <span className="stat-value">{stats.msts}</span>
+            </div>
           </div>
-          <div className="stat-info">
-            <span className="stat-label">Mid-Sem (MST)</span>
-            <span className="stat-value">{stats.msts}</span>
-          </div>
-        </div>
 
-        <div className="stat-card">
-          <div className="stat-icon-wrapper gold">
-            <FileCheck className="stat-icon" />
+          <div className="stat-card">
+            <div className="stat-icon-wrapper gold">
+              <FileCheck className="stat-icon" />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">End-Sem (EST)</span>
+              <span className="stat-value">{stats.ests}</span>
+            </div>
           </div>
-          <div className="stat-info">
-            <span className="stat-label">End-Sem (EST)</span>
-            <span className="stat-value">{stats.ests}</span>
-          </div>
-        </div>
 
-        <div className="stat-card">
-          <div className="stat-icon-wrapper red">
-            <Download className="stat-icon" />
+          <div className="stat-card">
+            <div className="stat-icon-wrapper blue">
+              <HelpCircle className="stat-icon" />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Auxiliary (AUX)</span>
+              <span className="stat-value">{stats.auxs}</span>
+            </div>
           </div>
-          <div className="stat-info">
-            <span className="stat-label">Total Downloads</span>
-            <span className="stat-value">{stats.totalDownloads}</span>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Filters Area */}
-      <section className="filters-panel">
-        <div className="search-bar-wrapper">
-          <Search className="search-bar-icon" />
-          <input
-            type="text"
-            className="search-input"
-            placeholder="Search by subject code, name, or branch..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="clear-search-btn" onClick={() => setSearchQuery('')}>
-              <X className="clear-icon" />
-            </button>
-          )}
+      <form className="filters-panel glass-morphism" onSubmit={handleSearchSubmit}>
+        <div className="college-search-container">
+          <div className="college-search-field">
+            <label className="college-search-label">Search by Course Code</label>
+            <div className="search-bar-wrapper">
+              <Search className="search-bar-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="e.g. UMA023, UCS303..."
+                value={draftCcode}
+                onChange={(e) => {
+                  setDraftCcode(e.target.value);
+                  setDraftCname('');
+                }}
+              />
+              {draftCcode && (
+                <button type="button" className="clear-search-btn" onClick={() => setDraftCcode('')}>
+                  <X className="clear-icon" />
+                </button>
+              )}
+            </div>
+          </div>
+          <div className="search-separator">OR</div>
+          <div className="college-search-field">
+            <label className="college-search-label">Search by Course Name</label>
+            <div className="search-bar-wrapper">
+              <Search className="search-bar-icon" />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="e.g. Mathematics, Operating Systems..."
+                value={draftCname}
+                onChange={(e) => {
+                  setDraftCname(e.target.value);
+                  setDraftCcode('');
+                }}
+              />
+              {draftCname && (
+                <button type="button" className="clear-search-btn" onClick={() => setDraftCname('')}>
+                  <X className="clear-icon" />
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="filter-dropdowns">
@@ -240,9 +311,10 @@ export default function Pyqs() {
                 { value: '4', label: '4th Year' }
               ].map(tab => (
                 <button
+                  type="button"
                   key={tab.value}
-                  className={`filter-tab-btn ${selectedYear === tab.value ? 'active' : ''}`}
-                  onClick={() => setSelectedYear(tab.value)}
+                  className={`filter-tab-btn ${draftYear === tab.value ? 'active' : ''}`}
+                  onClick={() => setDraftYear(tab.value)}
                 >
                   {tab.label}
                 </button>
@@ -257,12 +329,14 @@ export default function Pyqs() {
               {[
                 { value: 'all', label: 'All Exams' },
                 { value: 'MST', label: 'Mid-Sem' },
-                { value: 'EST', label: 'End-Sem' }
+                { value: 'EST', label: 'End-Sem' },
+                { value: 'AUX', label: 'Auxiliary' }
               ].map(tab => (
                 <button
+                  type="button"
                   key={tab.value}
-                  className={`filter-tab-btn ${selectedExamType === tab.value ? 'active' : ''}`}
-                  onClick={() => setSelectedExamType(tab.value)}
+                  className={`filter-tab-btn ${draftExamType === tab.value ? 'active' : ''}`}
+                  onClick={() => setDraftExamType(tab.value)}
                 >
                   {tab.label}
                 </button>
@@ -277,8 +351,8 @@ export default function Pyqs() {
               <Calendar className="select-icon" />
               <select
                 className="filter-select"
-                value={selectedPaperYear}
-                onChange={(e) => setSelectedPaperYear(e.target.value)}
+                value={draftPaperYear}
+                onChange={(e) => setDraftPaperYear(e.target.value)}
               >
                 {paperYears.map(year => (
                   <option key={year} value={year}>
@@ -290,16 +364,23 @@ export default function Pyqs() {
           </div>
         </div>
 
+        <div className="search-action-row">
+          <button type="submit" className="btn-cosmic btn-glow btn-search-pyqs">
+            <Search className="btn-icon" />
+            <span>Search Vault</span>
+          </button>
+        </div>
+
         {/* Clear filters banner */}
-        {(searchQuery || selectedYear !== 'all' || selectedExamType !== 'all' || selectedPaperYear !== 'all') && (
+        {hasSearched && (activeCcode || activeCname || activeYear !== '1' || activeExamType !== 'all' || activePaperYear !== 'all') && (
           <div className="active-filters-summary">
             <span className="filters-applied-text">Filters applied. Found {filteredPapers.length} results.</span>
-            <button className="btn-text" onClick={handleResetFilters}>
+            <button type="button" className="btn-text" onClick={handleResetFilters}>
               Reset all filters
             </button>
           </div>
         )}
-      </section>
+      </form>
 
       {/* PYQ Papers Grid */}
       <main className="pyq-papers-section">
@@ -307,6 +388,12 @@ export default function Pyqs() {
           <div className="pyq-loading-container">
             <div className="pyq-loading-spinner"></div>
             <p>Scanning the vaults for exam papers...</p>
+          </div>
+        ) : !hasSearched ? (
+          <div className="pyq-empty-state glass-morphism pyq-search-placeholder">
+            <BookOpen className="empty-icon animate-pulse" style={{ color: 'var(--color-accent)' }} />
+            <h2>Nava Nalanda PYQ Vault</h2>
+            <p>Enter a Course Code or Course Name above, select your year and exam filters, then click "Search Vault" to browse the archives.</p>
           </div>
         ) : filteredPapers.length > 0 ? (
           <div className="pyq-grid">

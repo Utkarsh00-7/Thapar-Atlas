@@ -8,7 +8,7 @@ const wifiNetworks = [
   { name: 'Audi', password: 'audi@net' },
   { name: 'CSED', password: 'csed@123#' },
   { name: 'Directorate', password: 'dir@tu&98765' },
-  { name: 'Machine Tool', password: 'workshop@54321' },
+  { name: 'Workshop', password: 'workshop@54321' },
   { name: 'Placement Cell', password: 'Cilp@98765' },
   { name: 'TU', password: 'tu@inet1' },
   { name: 'LC', password: 'lc@tiet1' },
