@@ -30,14 +30,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // 3. PYQs: Anyone can read, only Admins can write (updates allowed for downloads count)
+    // 3. PYQs: Anyone can read, only Admins can write
     match /pyqs/{document} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // 4. Academic Resources: Anyone can read, only Admins can write (updates allowed for downloads count)
+    // 4. Academic Resources: Anyone can read, only Admins can write
     match /resources/{document} {
-      allow read, write: if true;
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     // 5. Student profiles: Authenticated users can read, only the user themselves or Admins can write (IDOR protection)
