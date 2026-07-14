@@ -30,16 +30,18 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // 3. PYQs: Anyone can read, only Admins can write
+    // 3. PYQs: Anyone can read, Admins can write, anyone can increment downloads
     match /pyqs/{document} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads']));
     }
 
-    // 4. Academic Resources: Anyone can read, only Admins can write
+    // 4. Academic Resources: Anyone can read, Admins can write, anyone can increment downloads
     match /resources/{document} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['downloads']));
     }
 
     // 5. Student profiles: Authenticated users can read, only the user themselves or Admins can write (IDOR protection)
@@ -49,16 +51,23 @@ service cloud.firestore {
     }
 
     // 6. User Feedback & appeals: Authenticated students can create, only Admins can read/manage (Spam/IDOR protection)
-    match /feedbacks/{document} {
+    match /user_feedbacks/{document} {
       allow create: if isThaparStudent();
       allow read, write: if isAdmin();
     }
-    match /appeals/{document} {
+    match /user_appeals/{document} {
       allow create: if isThaparStudent();
       allow read, write: if isAdmin();
     }
 
-    // 7. Pending Contributions: Authenticated students can create, only Admins can read/manage
+    // 7. User Restrictions: Authenticated users can read, only Admins can write (restricted users can set hasAppealed)
+    match /user_restrictions/{document} {
+      allow read: if isAuthenticated();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasAppealed']));
+    }
+
+    // 8. Pending Contributions: Authenticated students can create, only Admins can read/manage
     match /pending_contributions/{document} {
       allow create: if isThaparStudent();
       allow read, write: if isAdmin();
