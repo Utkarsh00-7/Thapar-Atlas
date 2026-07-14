@@ -35,6 +35,7 @@ export default function Pyqs() {
   const [activePaperYear, setActivePaperYear] = useState('all');
   const [hasSearched, setHasSearched] = useState(false);
   const [downloadToast, setDownloadToast] = useState(null);
+  const [validationError, setValidationError] = useState('');
 
   useEffect(() => {
     async function loadData() {
@@ -148,6 +149,11 @@ export default function Pyqs() {
 
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
+    if (!draftCcode.trim() && !draftCname.trim()) {
+      setValidationError('Please enter either a Course Code or a Course Name to search.');
+      return;
+    }
+    setValidationError('');
     setActiveCcode(draftCcode);
     setActiveCname(draftCname);
     setActiveYear(draftYear);
@@ -169,6 +175,7 @@ export default function Pyqs() {
     setActiveExamType('all');
     setActivePaperYear('all');
     setHasSearched(false);
+    setValidationError('');
   };
 
   return (
@@ -266,6 +273,7 @@ export default function Pyqs() {
                 onChange={(e) => {
                   setDraftCcode(e.target.value);
                   setDraftCname('');
+                  setValidationError('');
                 }}
               />
               {draftCcode && (
@@ -288,6 +296,7 @@ export default function Pyqs() {
                 onChange={(e) => {
                   setDraftCname(e.target.value);
                   setDraftCcode('');
+                  setValidationError('');
                 }}
               />
               {draftCname && (
@@ -363,6 +372,13 @@ export default function Pyqs() {
             </div>
           </div>
         </div>
+
+        {validationError && (
+          <div className="search-validation-error">
+            <HelpCircle size={16} />
+            <span>{validationError}</span>
+          </div>
+        )}
 
         <div className="search-action-row">
           <button type="submit" className="btn-cosmic btn-glow btn-search-pyqs">

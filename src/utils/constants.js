@@ -42,8 +42,9 @@ export const YEARS = [
 
 export const BRANCHES = {
   1: [
-    { id: 'pool-a', label: 'Pool A (COE, COPC, COBS, EEC, ECE, ENC, MEE, ELE)' },
-    { id: 'pool-b', label: 'Pool B (DSAI, RAI, CHE, CIE, BT)' },
+    { id: 'pool-a', label: 'Pool A (COE, COPC, COBS, EEC, MEE, ELE, CHE, CIE, CCA, EIC, MXE)' },
+    { id: 'pool-b', label: 'Pool B (BT, ECE, ENC, RAI)' },
+    { id: 'dsai', label: 'Artificial Intelligence and Data Science (DSAI)' },
   ],
   2: [
     { id: 'coe', label: 'Computer Engineering (COE)' },
@@ -51,14 +52,17 @@ export const BRANCHES = {
     { id: 'cobs', label: 'Computer Science and Business Systems (COBS)' },
     { id: 'dsai', label: 'Artificial Intelligence and Data Science (DSAI)' },
     { id: 'eec', label: 'Electrical and Computer Engineering (EEC)' },
-    { id: 'ece', label: 'Electronics & Communication Engineering (ECE)' },
-    { id: 'enc', label: 'Electronics and Computer Engineering (ENC)' },
-    { id: 'rai', label: 'Robotics and Artificial Intelligence (RAI)' },
     { id: 'mee', label: 'Mechanical Engineering (MEE)' },
-    { id: 'che', label: 'Chemical Engineering (CHE)' },
-    { id: 'cie', label: 'Civil Engineering (CIE)' },
     { id: 'ele', label: 'Electrical Engineering (ELE)' },
     { id: 'bt', label: 'Biotechnology (BT)' },
+    { id: 'che', label: 'Chemical Engineering (CHE)' },
+    { id: 'cie', label: 'Civil Engineering (CIE)' },
+    { id: 'cca', label: 'Civil Engineering with Computer Application (CCA)' },
+    { id: 'eic', label: 'Electronics (Instrumentation and Control) Engineering (EIC)' },
+    { id: 'enc', label: 'Electronics and Computer Engineering (ENC)' },
+    { id: 'ece', label: 'Electronics and Communication Engineering (ECE)' },
+    { id: 'mxe', label: 'Mechatronics Engineering (MXE)' },
+    { id: 'rai', label: 'Robotics and Artificial Intelligence (RAI)' },
   ],
   // 3rd and 4th year share the same branch list
   get 3() { return this[2]; },
