@@ -42,8 +42,8 @@ export const YEARS = [
 
 export const BRANCHES = {
   1: [
-    { id: 'pool-a', label: 'Pool A (COE, COPC, COBS, EEC, MEE, ELE, CHE, CIE, CCA, EIC, MXE)' },
-    { id: 'pool-b', label: 'Pool B (BT, ECE, ENC, RAI)' },
+    { id: 'pool-a', label: 'Pool A' },
+    { id: 'pool-b', label: 'Pool B' },
     { id: 'dsai', label: 'Artificial Intelligence and Data Science (DSAI)' },
   ],
   2: [
