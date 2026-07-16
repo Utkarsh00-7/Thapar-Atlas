@@ -441,10 +441,9 @@ export default function Resources() {
             <div className="subject-card-info">
               <div className="subject-card-name">{subject.name}</div>
               <div className="subject-card-meta">
-                {Object.values(subject.resources || {}).reduce(
-                  (sum, arr) => sum + arr.length,
-                  0
-                )}{' '}
+                {Object.entries(subject.resources || {})
+                  .filter(([key]) => key !== 'pyq' && key !== 'pyq-answer')
+                  .reduce((sum, [, arr]) => sum + arr.length, 0)}{' '}
                 resources available
               </div>
             </div>
