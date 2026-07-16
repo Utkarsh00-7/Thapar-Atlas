@@ -90,9 +90,21 @@ export default function Header({ theme, toggleTheme }) {
   
   // Dropdown & login error states
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [showErrorToast, setShowErrorToast] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const dropdownRef = useRef(null);
+
+  const triggerToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+  };
+
+  useEffect(() => {
+    if (toast.show) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, show: false }));
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.show]);
 
   // Student Profile States
   const [profileModalOpen, setProfileModalOpen] = useState(false);
@@ -206,11 +218,11 @@ export default function Header({ theme, toggleTheme }) {
     try {
       const savedData = await saveStudentProfile(user.uid, user.email, studentProfile);
       setCurrentUserProfile(savedData);
-      alert('Profile details saved successfully!');
+      triggerToast('Profile details saved successfully!', 'success');
       setProfileModalOpen(false);
     } catch (err) {
       console.error(err);
-      alert('Failed to save profile details. Please try again.');
+      triggerToast('Failed to save profile details. Please try again.', 'error');
     }
     setProfileSaving(false);
   };
@@ -220,9 +232,7 @@ export default function Header({ theme, toggleTheme }) {
       await loginWithGoogle();
     } catch (err) {
       console.error("Login error details:", err);
-      setErrorMessage(err.message || "Failed to sign in. Please try again.");
-      setShowErrorToast(true);
-      setTimeout(() => setShowErrorToast(false), 6000);
+      triggerToast(err.message || "Failed to sign in. Please try again.", 'error');
     }
   };
 
@@ -548,11 +558,15 @@ export default function Header({ theme, toggleTheme }) {
               )}
             </div>
 
-            {/* Error Toast */}
-            {showErrorToast && (
-              <div className="header__error-toast glass-panel">
-                <ShieldAlert size={16} className="error-toast-icon" />
-                <span>{errorMessage}</span>
+            {/* Unified Custom Toast Notification */}
+            {toast.show && (
+              <div className={`header__toast glass-panel ${toast.type}`}>
+                {toast.type === 'error' ? (
+                  <ShieldAlert size={16} className="error-toast-icon" />
+                ) : (
+                  <CheckCircle size={16} className="success-toast-icon" style={{ color: '#10B981' }} />
+                )}
+                <span>{toast.message}</span>
               </div>
             )}
 

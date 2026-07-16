@@ -206,6 +206,53 @@
   width: 100%;
 }
 
+/* ─── Search Suggestions Dropdown ─── */
+.search-suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 50;
+  background: rgba(18, 16, 15, 0.98);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 10px rgba(34, 211, 238, 0.05);
+  padding: var(--space-2) 0;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.suggestion-item {
+  padding: 8px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all var(--transition-base);
+}
+
+.suggestion-item:hover {
+  background: rgba(34, 211, 238, 0.08);
+}
+
+.suggestion-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+}
+
+.suggestion-name {
+  color: var(--color-text-primary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .search-bar-icon {
   position: absolute;
   left: var(--space-4);
@@ -380,6 +427,134 @@
 .btn-text:hover {
   text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
   text-decoration: underline;
+}
+
+/* ─── PYQ Table Layout ─── */
+.pyq-table-wrapper {
+  background: var(--color-bg-glass);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.pyq-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--font-body);
+}
+
+.pyq-table th {
+  background: rgba(142, 29, 6, 0.85);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pyq-table td {
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.pyq-table tbody tr {
+  transition: background-color var(--transition-base);
+}
+
+.pyq-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.pyq-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Row-specific styles */
+.subject-title {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.exam-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.05em;
+  display: inline-block;
+  text-align: center;
+  min-width: 50px;
+}
+
+.exam-badge.mst {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
+  border: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.exam-badge.est {
+  background: rgba(251, 191, 36, 0.1);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.exam-badge.aux {
+  background: rgba(139, 92, 246, 0.1);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.exam-badge.summer {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Table Actions & Buttons */
+.table-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.btn-table-download {
+  background: linear-gradient(135deg, var(--color-accent) 0%, #0891b2 100%);
+  border: none;
+  color: #0f172a !important;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all var(--transition-base);
+}
+
+.btn-table-download:hover {
+  box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-outline-glow.btn-xs {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
 }
 
 /* ─── PYQ Cards Grid ─── */

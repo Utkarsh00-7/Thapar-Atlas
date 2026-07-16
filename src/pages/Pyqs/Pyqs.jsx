@@ -36,6 +36,31 @@ export default function Pyqs() {
   const [hasSearched, setHasSearched] = useState(false);
   const [downloadToast, setDownloadToast] = useState(null);
   const [validationError, setValidationError] = useState('');
+  const [showCodeSuggestions, setShowCodeSuggestions] = useState(false);
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+
+  // Extract unique subject codes and names for suggestions
+  const uniqueSubjectCodes = useMemo(() => {
+    const codes = pyqs.map(p => p.subjectCode?.toUpperCase()).filter(Boolean);
+    return [...new Set(codes)].sort();
+  }, [pyqs]);
+
+  const uniqueSubjectNames = useMemo(() => {
+    const names = pyqs.map(p => p.subjectName).filter(Boolean);
+    return [...new Set(names)].sort();
+  }, [pyqs]);
+
+  const codeSuggestions = useMemo(() => {
+    if (!draftCcode.trim()) return [];
+    const query = draftCcode.toUpperCase().trim();
+    return uniqueSubjectCodes.filter(c => c.includes(query)).slice(0, 8);
+  }, [draftCcode, uniqueSubjectCodes]);
+
+  const nameSuggestions = useMemo(() => {
+    if (!draftCname.trim()) return [];
+    const query = draftCname.toLowerCase().trim();
+    return uniqueSubjectNames.filter(n => n.toLowerCase().includes(query)).slice(0, 8);
+  }, [draftCname, uniqueSubjectNames]);
 
   useEffect(() => {
     async function loadData() {
@@ -95,10 +120,34 @@ export default function Pyqs() {
     });
   }, [pyqs, activeCcode, activeCname, activeYear, activePaperYear]);
 
-  // Filter logic (applies exam type filter as well)
+  // Filter and sort logic (applies exam type filter and sorts by Year asc, then MST -> EST -> AUX)
   const filteredPapers = useMemo(() => {
-    return baseFiltered.filter(paper => {
+    const filtered = baseFiltered.filter(paper => {
       return activeExamType === 'all' || paper.examType === activeExamType;
+    });
+
+    const getExamRank = (type) => {
+      const t = (type || '').toUpperCase().trim();
+      if (t === 'MST') return 1;
+      if (t === 'EST') return 2;
+      if (t === 'AUX') return 3;
+      if (t.includes('SUMMER') && t.includes('MST')) return 4;
+      if (t.includes('SUMMER') && t.includes('EST')) return 5;
+      return 99;
+    };
+
+    return [...filtered].sort((a, b) => {
+      // 1. Sort by Paper Year (Ascending: 2020, 2024, 2025, 2026)
+      const yearA = Number(a.paperYear || 0);
+      const yearB = Number(b.paperYear || 0);
+      if (yearA !== yearB) {
+        return yearA - yearB;
+      }
+
+      // 2. Sort by Exam Type Rank
+      const rankA = getExamRank(a.examType);
+      const rankB = getExamRank(b.examType);
+      return rankA - rankB;
     });
   }, [baseFiltered, activeExamType]);
 
@@ -275,11 +324,33 @@ export default function Pyqs() {
                   setDraftCname('');
                   setValidationError('');
                 }}
+                onFocus={() => setShowCodeSuggestions(true)}
+                onBlur={() => setShowCodeSuggestions(false)}
               />
               {draftCcode && (
                 <button type="button" className="clear-search-btn" onClick={() => setDraftCcode('')}>
                   <X className="clear-icon" />
                 </button>
+              )}
+              {showCodeSuggestions && codeSuggestions.length > 0 && (
+                <div className="search-suggestions-dropdown glass-morphism">
+                  {codeSuggestions.map(code => (
+                    <div
+                      key={code}
+                      className="suggestion-item"
+                      onMouseDown={() => {
+                        setDraftCcode(code);
+                        setDraftCname('');
+                        setShowCodeSuggestions(false);
+                        setActiveCcode(code);
+                        setActiveCname('');
+                        setHasSearched(true);
+                      }}
+                    >
+                      <span className="suggestion-code">{code}</span>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -298,11 +369,33 @@ export default function Pyqs() {
                   setDraftCcode('');
                   setValidationError('');
                 }}
+                onFocus={() => setShowNameSuggestions(true)}
+                onBlur={() => setShowNameSuggestions(false)}
               />
               {draftCname && (
                 <button type="button" className="clear-search-btn" onClick={() => setDraftCname('')}>
                   <X className="clear-icon" />
                 </button>
+              )}
+              {showNameSuggestions && nameSuggestions.length > 0 && (
+                <div className="search-suggestions-dropdown glass-morphism">
+                  {nameSuggestions.map(name => (
+                    <div
+                      key={name}
+                      className="suggestion-item"
+                      onMouseDown={() => {
+                        setDraftCname(name);
+                        setDraftCcode('');
+                        setShowNameSuggestions(false);
+                        setActiveCname(name);
+                        setActiveCcode('');
+                        setHasSearched(true);
+                      }}
+                    >
+                      <span className="suggestion-name">{name}</span>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           </div>
@@ -412,62 +505,57 @@ export default function Pyqs() {
             <p>Enter a Course Code or Course Name above, select your year and exam filters, then click "Search Vault" to browse the archives.</p>
           </div>
         ) : filteredPapers.length > 0 ? (
-          <div className="pyq-grid">
-            {filteredPapers.map(paper => (
-              <article key={paper.id} className="pyq-card">
-                <div className="card-header">
-                  <span className="subject-code-tag">{paper.subjectCode}</span>
-                  <span className={`exam-type-badge ${paper.examType.toLowerCase()}`}>
-                    {paper.examType}
-                  </span>
-                </div>
-
-                <div className="card-body">
-                  <h3 className="subject-name">{paper.subjectName}</h3>
-                  <div className="meta-info">
-                    <div className="meta-item">
-                      <span className="meta-label">Year:</span>
-                      <span className="meta-value">{paper.studyYear === 1 ? '1st' : paper.studyYear === 2 ? '2nd' : paper.studyYear === 3 ? '3rd' : '4th'} Year</span>
-                    </div>
-                    <div className="meta-item">
-                      <span className="meta-label">Branch:</span>
-                      <span className="meta-value text-truncate">{paper.branch}</span>
-                    </div>
-                    <div className="meta-item">
-                      <span className="meta-label">Paper Year:</span>
-                      <span className="meta-value font-mono">{paper.paperYear}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-footer">
-                  <div className="downloads-stat">
-                    <Download className="footer-icon-small" />
-                    <span>{paper.downloads || 0} downloads</span>
-                  </div>
-
-                  <div className="card-actions">
-                    {paper.answerUrl && (
-                      <button
-                        onClick={() => handleDownload(paper.id, paper.subjectCode, paper.examType, true)}
-                        className="btn-outline-glow btn-sm"
-                        title="Download Answer Key"
-                      >
-                        Answer Key
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleDownload(paper.id, paper.subjectCode, paper.examType, false)}
-                      className="btn-solid-glow btn-sm"
-                      title="Download Question Paper"
-                    >
-                      <Download className="btn-icon-sm" />
-                      Paper
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
+          <div className="pyq-table-wrapper glass-morphism">
+            <div className="table-responsive">
+              <table className="pyq-table">
+                <thead>
+                  <tr>
+                    <th>Course Code</th>
+                    <th>Course Name</th>
+                    <th>Year</th>
+                    <th>Semester</th>
+                    <th>Type of Examination</th>
+                    <th className="text-center">Download Link</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredPapers.map(paper => (
+                    <tr key={paper.id}>
+                      <td className="font-mono font-bold text-accent">{paper.subjectCode}</td>
+                      <td className="subject-title">{paper.subjectName}</td>
+                      <td>{paper.paperYear}</td>
+                      <td>{paper.semester || 'E'}</td>
+                      <td>
+                        <span className={`exam-badge ${paper.examType.toLowerCase()}`}>
+                          {paper.examType}
+                        </span>
+                      </td>
+                      <td className="text-center">
+                        <div className="table-actions">
+                          {paper.answerUrl && (
+                            <button
+                              onClick={() => handleDownload(paper.id, paper.subjectCode, paper.examType, true)}
+                              className="btn-outline-glow btn-xs"
+                              title="Download Answer Key"
+                            >
+                              Answer Key
+                            </button>
+                          )}
+                          <button
+                            onClick={() => handleDownload(paper.id, paper.subjectCode, paper.examType, false)}
+                            className="btn-table-download"
+                            title="Download Question Paper"
+                          >
+                            <Download size={14} />
+                            <span>Download</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : (
           <div className="pyq-empty-state">
