@@ -5,8 +5,6 @@ import {
   ArrowLeft,
   ChevronRight,
   FileText,
-  ClipboardList,
-  CheckSquare,
   FlaskConical,
   Video,
   GraduationCap,
@@ -36,8 +34,6 @@ const yearIcons = { Layers, GitBranch, Rocket, Award };
 const typeIcons = {
   syllabus: FileText,
   notes: FileText,
-  pyq: ClipboardList,
-  'pyq-answer': CheckSquare,
   book: BookOpen,
   'lab-manual': FlaskConical,
   youtube: Video,
