@@ -2752,6 +2752,8 @@ export default function Admin() {
             </div>
           </div>
         </div>
+      )}
+
       {/* Reset Database Confirmation Modal */}
       {showResetModal && (
         <div className="modal-overlay">
@@ -2864,5 +2866,6 @@ export default function Admin() {
       )}
     </div>
   );
+}
 }
 
