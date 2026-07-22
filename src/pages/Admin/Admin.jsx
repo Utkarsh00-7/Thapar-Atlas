@@ -45,6 +45,7 @@ import { resourceTypes } from '../../utils/resourcesData';
 import {
   getAcademicData,
   addResource,
+  updateResource,
   deleteResource,
   resetDatabase,
   exportAsJSCode,
@@ -143,6 +144,13 @@ export default function Admin() {
   // Drag and drop reordering state
   const [draggedIndex, setDraggedIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  // Resource editing state
+  const [editingResId, setEditingResId] = useState(null);
+  const [editResTitle, setEditResTitle] = useState('');
+  const [editResLink, setEditResLink] = useState('');
+  const [editResSize, setEditResSize] = useState('');
+  const [editIsSaving, setEditIsSaving] = useState(false);
 
   // UI States
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -494,6 +502,47 @@ export default function Admin() {
         console.error(err);
         showToast('Failed to delete resource.', 'error');
       }
+    }
+  // Resource edit handlers
+  const handleStartEditResource = (res) => {
+    setEditingResId(res.id);
+    setEditResTitle(res.title || '');
+    setEditResLink(res.link || '');
+    setEditResSize(res.size || '');
+  };
+
+  const handleCancelEditResource = () => {
+    setEditingResId(null);
+    setEditResTitle('');
+    setEditResLink('');
+    setEditResSize('');
+  };
+
+  const handleSaveEditResource = async (resId) => {
+    if (!editResTitle.trim()) {
+      showToast('Title cannot be empty.', 'error');
+      return;
+    }
+    setEditIsSaving(true);
+    try {
+      const updatedFields = {
+        title: editResTitle.trim(),
+        link: editResLink.trim() || '#',
+        size: editResSize.trim() || 'Link'
+      };
+
+      const updatedData = await updateResource(resId, updatedFields);
+      setAcademicData(updatedData);
+      setEditingResId(null);
+      setEditResTitle('');
+      setEditResLink('');
+      setEditResSize('');
+      showToast('Resource updated successfully!', 'success');
+    } catch (err) {
+      console.error('Failed to update resource:', err);
+      showToast('Failed to update resource details.', 'error');
+    } finally {
+      setEditIsSaving(false);
     }
   };
 
@@ -1539,60 +1588,169 @@ export default function Admin() {
                   </div>
                 ) : resourcesList.length > 0 ? (
                   <div className="admin-resources-list">
-                    {resourcesList.map((res, index) => (
-                      <div 
-                        key={res.id} 
-                        className={`admin-resource-item ${draggedIndex === index ? 'is-dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''}`}
-                        draggable
-                        onDragStart={(e) => handleResourceDragStart(e, index)}
-                        onDragOver={(e) => handleResourceDragOver(e, index)}
-                        onDrop={(e) => handleResourceDrop(e, index)}
-                        onDragEnd={handleResourceDragEnd}
-                      >
+                    {resourcesList.map((res, index) => {
+                      const isEditing = editingResId === res.id;
+                      return (
                         <div 
-                          className="drag-handle-grip" 
-                          title="Click & Drag to reorder file"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'grab',
-                            color: 'var(--color-text-tertiary)',
-                            padding: '4px',
-                            marginRight: '6px'
-                          }}
+                          key={res.id} 
+                          className={`admin-resource-item ${draggedIndex === index ? 'is-dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''} ${isEditing ? 'is-editing-card' : ''}`}
+                          draggable={!isEditing}
+                          onDragStart={(e) => !isEditing && handleResourceDragStart(e, index)}
+                          onDragOver={(e) => !isEditing && handleResourceDragOver(e, index)}
+                          onDrop={(e) => !isEditing && handleResourceDrop(e, index)}
+                          onDragEnd={handleResourceDragEnd}
                         >
-                          <GripVertical size={18} />
+                          {!isEditing && (
+                            <div 
+                              className="drag-handle-grip" 
+                              title="Click & Drag to reorder file"
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'grab',
+                                color: 'var(--color-text-tertiary)',
+                                padding: '4px',
+                                marginRight: '6px'
+                              }}
+                            >
+                              <GripVertical size={18} />
+                            </div>
+                          )}
+
+                          {isEditing ? (
+                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px 0' }}>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)', minWidth: '55px' }}>Title:</label>
+                                <input
+                                  type="text"
+                                  value={editResTitle}
+                                  onChange={(e) => setEditResTitle(e.target.value)}
+                                  placeholder="Edit Resource Title..."
+                                  style={{
+                                    flex: 1,
+                                    padding: '6px 10px',
+                                    fontSize: '0.88rem',
+                                    fontWeight: '600',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--color-accent)',
+                                    background: 'rgba(0, 0, 0, 0.25)',
+                                    color: 'var(--color-text-primary)'
+                                  }}
+                                  autoFocus
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)', minWidth: '55px' }}>Link:</label>
+                                <input
+                                  type="text"
+                                  value={editResLink}
+                                  onChange={(e) => setEditResLink(e.target.value)}
+                                  placeholder="URL / Google Drive Link"
+                                  style={{
+                                    flex: 1,
+                                    padding: '4px 8px',
+                                    fontSize: '0.8rem',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--color-border)',
+                                    background: 'rgba(0, 0, 0, 0.2)',
+                                    color: 'var(--color-text-primary)'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <label style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)', minWidth: '55px' }}>Size/Info:</label>
+                                <input
+                                  type="text"
+                                  value={editResSize}
+                                  onChange={(e) => setEditResSize(e.target.value)}
+                                  placeholder="e.g. 0.45 MB / Link / Video"
+                                  style={{
+                                    flex: 1,
+                                    padding: '4px 8px',
+                                    fontSize: '0.8rem',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--color-border)',
+                                    background: 'rgba(0, 0, 0, 0.2)',
+                                    color: 'var(--color-text-primary)'
+                                  }}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '4px' }}>
+                                <button
+                                  type="button"
+                                  onClick={handleCancelEditResource}
+                                  className="btn-secondary"
+                                  style={{ padding: '4px 12px', fontSize: '0.8rem', borderRadius: '6px' }}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSaveEditResource(res.id)}
+                                  disabled={editIsSaving}
+                                  className="btn-primary"
+                                  style={{ padding: '4px 12px', fontSize: '0.8rem', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                >
+                                  {editIsSaving ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                  Save Changes
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="item-details" style={{ flex: 1 }}>
+                                <h3>{res.title}</h3>
+                                <div className="item-meta">
+                                  <span>
+                                    <Calendar size={12} />
+                                    {res.date}
+                                  </span>
+                                  <span>
+                                    <FileText size={12} />
+                                    {res.size}
+                                  </span>
+                                  {res.link && res.link !== '#' && (
+                                    <a href={getDownloadLink(res.link)} target="_blank" rel="noopener noreferrer" className="item-link">
+                                      <LinkIcon size={12} />
+                                      View Link
+                                      <ExternalLink size={10} />
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <button 
+                                  className="btn-icon-action btn-edit" 
+                                  onClick={() => handleStartEditResource(res)}
+                                  title="Edit Resource Title & Info"
+                                  style={{
+                                    background: 'rgba(139, 92, 246, 0.1)',
+                                    color: 'var(--color-accent)',
+                                    border: '1px solid rgba(139, 92, 246, 0.2)',
+                                    padding: '8px',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  <Edit size={16} />
+                                </button>
+                                <button 
+                                  className="btn-delete" 
+                                  onClick={() => handleDeleteResource(res.id, res.title)}
+                                  title="Delete resource"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </div>
-                        <div className="item-details" style={{ flex: 1 }}>
-                          <h3>{res.title}</h3>
-                          <div className="item-meta">
-                            <span>
-                              <Calendar size={12} />
-                              {res.date}
-                            </span>
-                            <span>
-                              <FileText size={12} />
-                              {res.size}
-                            </span>
-                            {res.link && res.link !== '#' && (
-                              <a href={getDownloadLink(res.link)} target="_blank" rel="noopener noreferrer" className="item-link">
-                                <LinkIcon size={12} />
-                                View Link
-                                <ExternalLink size={10} />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                        <button 
-                          className="btn-delete" 
-                          onClick={() => handleDeleteResource(res.id, res.title)}
-                          title="Delete resource"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <div className="list-empty-state">

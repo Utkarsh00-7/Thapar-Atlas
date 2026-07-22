@@ -301,6 +301,19 @@ export async function addResource(yearId, branchId, subjectId, typeId, resource)
 }
 
 /**
+ * Updates an existing resource in Firestore.
+ */
+export async function updateResource(resourceId, updatedFields) {
+  try {
+    const docRef = doc(db, RESOURCES_COLLECTION, resourceId);
+    await updateDoc(docRef, updatedFields);
+  } catch (e) {
+    console.error('Failed to update resource in Firestore:', e);
+  }
+  return getAcademicData();
+}
+
+/**
  * Deletes a resource from Firestore.
  */
 export async function deleteResource(yearId, branchId, subjectId, typeId, resourceId) {
