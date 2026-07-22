@@ -36,7 +36,9 @@ import {
   Users,
   Search,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Upload,
+  Loader2
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
 import {
@@ -118,6 +120,12 @@ export default function Admin() {
   const [selectedTypeId, setSelectedTypeId] = useState('notes');
 
   // Form states for Resource manager
+  const [adminUploadMode, setAdminUploadMode] = useState('file'); // 'file' or 'link'
+  const [adminSelectedFile, setAdminSelectedFile] = useState(null);
+  const [adminFileName, setAdminFileName] = useState('');
+  const [adminFileSize, setAdminFileSize] = useState('');
+  const [adminIsUploading, setAdminIsUploading] = useState(false);
+
   const [title, setTitle] = useState('');
   const [link, setLink] = useState('');
   const [size, setSize] = useState('');
@@ -304,6 +312,27 @@ export default function Admin() {
   const currentSubject = currentBranch?.subjects?.find((s) => s.id === selectedSubjectId);
   const resourcesList = currentSubject?.resources?.[selectedTypeId] || [];
 
+  // Admin file upload handlers
+  const handleAdminFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setAdminSelectedFile(file);
+    setAdminFileName(file.name);
+    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+    setAdminFileSize(`${sizeInMB} MB`);
+
+    if (!title) {
+      const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+      setTitle(nameWithoutExt);
+    }
+  };
+
+  const handleAdminRemoveFile = () => {
+    setAdminSelectedFile(null);
+    setAdminFileName('');
+    setAdminFileSize('');
+  };
+
   // Form submission handler for Resource manager
   const handleAddResource = async (e) => {
     e.preventDefault();
@@ -317,16 +346,59 @@ export default function Admin() {
       return;
     }
 
-    const defaultSize = link.includes('youtube.com') || link.includes('youtu.be') ? 'Video' : 'Link';
-    
+    let finalLink = link.trim();
+    let finalSize = size.trim();
+    let isDirectUpload = false;
+
+    if (adminUploadMode === 'file') {
+      if (!adminSelectedFile) {
+        showToast('Please select a file to upload or switch to URL mode.', 'error');
+        return;
+      }
+      setAdminIsUploading(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', adminSelectedFile);
+        formData.append('upload_preset', 'thapar_atlas');
+
+        const res = await fetch('https://api.cloudinary.com/v1_1/dsff7vad7/auto/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error?.message || 'Failed to upload file to Cloudinary.');
+        }
+
+        const data = await res.json();
+        finalLink = data.secure_url;
+        finalSize = adminFileSize || `${(adminSelectedFile.size / (1024 * 1024)).toFixed(2)} MB`;
+        isDirectUpload = true;
+      } catch (uploadErr) {
+        console.error('Cloudinary upload error:', uploadErr);
+        showToast(`File upload failed: ${uploadErr.message}`, 'error');
+        setAdminIsUploading(false);
+        return;
+      }
+    } else {
+      if (!finalLink) {
+        showToast('Please enter a Google Drive link or URL.', 'error');
+        return;
+      }
+      const defaultSize = finalLink.includes('youtube.com') || finalLink.includes('youtu.be') ? 'Video' : 'Link';
+      if (!finalSize) finalSize = defaultSize;
+    }
+
     const newResource = {
       id: `res-${Date.now()}`,
       title: title.trim(),
       date: new Date().toISOString().split('T')[0],
-      size: size.trim() || defaultSize,
+      size: finalSize,
       downloads: 0,
-      isLink: true,
-      link: link.trim() || '#',
+      isLink: !isDirectUpload,
+      isDirectUpload,
+      link: finalLink || '#',
     };
 
     try {
@@ -342,10 +414,15 @@ export default function Admin() {
       setTitle('');
       setLink('');
       setSize('');
+      setAdminSelectedFile(null);
+      setAdminFileName('');
+      setAdminFileSize('');
       showToast(`"${newResource.title}" added successfully!`, 'success');
     } catch (err) {
       console.error(err);
       showToast('Failed to add resource to database.', 'error');
+    } finally {
+      setAdminIsUploading(false);
     }
   };
 
@@ -1120,40 +1197,161 @@ export default function Admin() {
                   {/* Resource Data Fields */}
                   {currentBranch && !currentBranch.comingSoon && (
                     <>
+                      {/* Upload Mode Selector */}
+                      <div className="form-group">
+                        <label>Resource Source</label>
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                          <button
+                            type="button"
+                            className={`btn-secondary ${adminUploadMode === 'file' ? 'active' : ''}`}
+                            onClick={() => setAdminUploadMode('file')}
+                            style={{
+                              flex: 1,
+                              padding: '8px 12px',
+                              fontSize: '0.85rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              border: adminUploadMode === 'file' ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                              background: adminUploadMode === 'file' ? 'var(--color-accent-subtle)' : 'transparent',
+                              color: adminUploadMode === 'file' ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontWeight: adminUploadMode === 'file' ? '600' : 'normal'
+                            }}
+                          >
+                            <Upload size={14} /> Direct File Upload
+                          </button>
+                          <button
+                            type="button"
+                            className={`btn-secondary ${adminUploadMode === 'link' ? 'active' : ''}`}
+                            onClick={() => setAdminUploadMode('link')}
+                            style={{
+                              flex: 1,
+                              padding: '8px 12px',
+                              fontSize: '0.85rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              border: adminUploadMode === 'link' ? '1px solid var(--color-accent)' : '1px solid var(--color-border)',
+                              background: adminUploadMode === 'link' ? 'var(--color-accent-subtle)' : 'transparent',
+                              color: adminUploadMode === 'link' ? 'var(--color-accent)' : 'var(--color-text-secondary)',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontWeight: adminUploadMode === 'link' ? '600' : 'normal'
+                            }}
+                          >
+                            <LinkIcon size={14} /> Google Drive / URL
+                          </button>
+                        </div>
+                      </div>
+
+                      {adminUploadMode === 'file' ? (
+                        <div className="form-group">
+                          <label>Upload Document / PDF File</label>
+                          <div style={{
+                            border: '2px dashed var(--color-border)',
+                            borderRadius: '12px',
+                            padding: '16px',
+                            textAlign: 'center',
+                            background: 'rgba(255, 255, 255, 0.02)',
+                            transition: 'border-color 0.2s ease'
+                          }}>
+                            {adminSelectedFile ? (
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
+                                  <FileText size={20} className="text-accent" />
+                                  <div style={{ textAlign: 'left' }}>
+                                    <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
+                                      {adminFileName}
+                                    </div>
+                                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)' }}>
+                                      {adminFileSize}
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={handleAdminRemoveFile}
+                                  className="btn-icon-action btn-delete"
+                                  title="Remove file"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            ) : (
+                              <label style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                <Upload size={24} style={{ color: 'var(--color-accent)' }} />
+                                <span style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--color-text-primary)' }}>
+                                  Click to upload PDF / document file
+                                </span>
+                                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)' }}>
+                                  Supports PDF, DOCX, PPTX, Images, ZIP
+                                </span>
+                                <input
+                                  type="file"
+                                  accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.zip"
+                                  onChange={handleAdminFileChange}
+                                  style={{ display: 'none' }}
+                                />
+                              </label>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="form-group">
+                            <label>Google Drive Link or URL</label>
+                            <input 
+                              type="url" 
+                              placeholder="e.g. https://drive.google.com/..." 
+                              value={link}
+                              onChange={(e) => setLink(e.target.value)}
+                            />
+                          </div>
+
+                          <div className="form-group">
+                            <label>File Size / Info</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g. 3.4 MB (Optional)" 
+                              value={size}
+                              onChange={(e) => setSize(e.target.value)}
+                            />
+                          </div>
+                        </>
+                      )}
+
                       <div className="form-group">
                         <label>Resource Title</label>
                         <input 
                           type="text" 
-                          placeholder="e.g. Mid Semester PYQ 2024" 
+                          placeholder="e.g. Mid Semester PYQ 2024 / Complete Notes" 
                           value={title}
                           onChange={(e) => setTitle(e.target.value)}
                           required
                         />
                       </div>
 
-                      <div className="form-group">
-                        <label>Google Drive Link or URL</label>
-                        <input 
-                          type="url" 
-                          placeholder="e.g. https://drive.google.com/..." 
-                          value={link}
-                          onChange={(e) => setLink(e.target.value)}
-                        />
-                      </div>
-
-                      <div className="form-group">
-                        <label>File Size / Info</label>
-                        <input 
-                          type="text" 
-                          placeholder="e.g. 3.4 MB (Optional)" 
-                          value={size}
-                          onChange={(e) => setSize(e.target.value)}
-                        />
-                      </div>
-
-                      <button type="submit" className="btn-primary btn-block btn-submit">
-                        <Plus size={18} />
-                        Add Resource
+                      <button 
+                        type="submit" 
+                        className="btn-primary btn-block btn-submit"
+                        disabled={adminIsUploading}
+                        style={{ marginTop: '8px' }}
+                      >
+                        {adminIsUploading ? (
+                          <>
+                            <Loader2 size={18} className="spinner-icon animate-spin" />
+                            Uploading File to Cloud...
+                          </>
+                        ) : (
+                          <>
+                            <Plus size={18} />
+                            Add Resource
+                          </>
+                        )}
                       </button>
                     </>
                   )}
