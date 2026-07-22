@@ -121,9 +121,8 @@ export default function Admin() {
 
   // Form states for Resource manager
   const [adminUploadMode, setAdminUploadMode] = useState('file'); // 'file' or 'link'
-  const [adminSelectedFile, setAdminSelectedFile] = useState(null);
-  const [adminFileName, setAdminFileName] = useState('');
-  const [adminFileSize, setAdminFileSize] = useState('');
+  const [adminSelectedFiles, setAdminSelectedFiles] = useState([]); // [{ id, file, name, size, customTitle }]
+  const [adminUploadProgress, setAdminUploadProgress] = useState({ current: 0, total: 0 });
   const [adminIsUploading, setAdminIsUploading] = useState(false);
 
   const [title, setTitle] = useState('');
@@ -314,23 +313,37 @@ export default function Admin() {
 
   // Admin file upload handlers
   const handleAdminFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    setAdminSelectedFile(file);
-    setAdminFileName(file.name);
-    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-    setAdminFileSize(`${sizeInMB} MB`);
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    if (!title) {
+    const fileItems = files.map((file, idx) => {
+      const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
       const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-      setTitle(nameWithoutExt);
-    }
+      return {
+        id: `file-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+        file,
+        name: file.name,
+        size: `${sizeInMB} MB`,
+        customTitle: nameWithoutExt
+      };
+    });
+
+    setAdminSelectedFiles((prev) => [...prev, ...fileItems]);
+    e.target.value = '';
   };
 
-  const handleAdminRemoveFile = () => {
-    setAdminSelectedFile(null);
-    setAdminFileName('');
-    setAdminFileSize('');
+  const handleRemoveSingleAdminFile = (id) => {
+    setAdminSelectedFiles((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleClearAllAdminFiles = () => {
+    setAdminSelectedFiles([]);
+  };
+
+  const handleUpdateFileTitle = (id, newTitle) => {
+    setAdminSelectedFiles((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, customTitle: newTitle } : item))
+    );
   };
 
   // Form submission handler for Resource manager
@@ -341,88 +354,120 @@ export default function Admin() {
       showToast('Please select a valid subject first.', 'error');
       return;
     }
-    if (!title.trim()) {
-      showToast('Please enter a resource title.', 'error');
-      return;
-    }
-
-    let finalLink = link.trim();
-    let finalSize = size.trim();
-    let isDirectUpload = false;
 
     if (adminUploadMode === 'file') {
-      if (!adminSelectedFile) {
-        showToast('Please select a file to upload or switch to URL mode.', 'error');
+      if (adminSelectedFiles.length === 0) {
+        showToast('Please select at least one file to upload or switch to URL mode.', 'error');
         return;
       }
+
       setAdminIsUploading(true);
+      setAdminUploadProgress({ current: 0, total: adminSelectedFiles.length });
+      let uploadedCount = 0;
+      let latestAcademicData = academicData;
+
       try {
-        const formData = new FormData();
-        formData.append('file', adminSelectedFile);
-        formData.append('upload_preset', 'thapar_atlas');
+        for (let i = 0; i < adminSelectedFiles.length; i++) {
+          const item = adminSelectedFiles[i];
+          setAdminUploadProgress({ current: i + 1, total: adminSelectedFiles.length });
 
-        const res = await fetch('https://api.cloudinary.com/v1_1/dsff7vad7/auto/upload', {
-          method: 'POST',
-          body: formData
-        });
+          const formData = new FormData();
+          formData.append('file', item.file);
+          formData.append('upload_preset', 'thapar_atlas');
 
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error?.message || 'Failed to upload file to Cloudinary.');
+          const res = await fetch('https://api.cloudinary.com/v1_1/dsff7vad7/auto/upload', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error?.message || `Failed to upload "${item.name}" to Cloudinary.`);
+          }
+
+          const data = await res.json();
+          const finalTitle = item.customTitle.trim() || item.name;
+
+          const newResource = {
+            id: `res-${Date.now()}-${i}`,
+            title: finalTitle,
+            date: new Date().toISOString().split('T')[0],
+            size: item.size,
+            downloads: 0,
+            isLink: false,
+            isDirectUpload: true,
+            link: data.secure_url,
+          };
+
+          latestAcademicData = await addResource(
+            selectedYearId,
+            selectedBranchId,
+            selectedSubjectId,
+            selectedTypeId,
+            newResource
+          );
+
+          uploadedCount++;
         }
 
-        const data = await res.json();
-        finalLink = data.secure_url;
-        finalSize = adminFileSize || `${(adminSelectedFile.size / (1024 * 1024)).toFixed(2)} MB`;
-        isDirectUpload = true;
+        setAcademicData(latestAcademicData);
+        setTitle('');
+        setLink('');
+        setSize('');
+        setAdminSelectedFiles([]);
+        showToast(`Successfully uploaded ${uploadedCount} file(s)!`, 'success');
       } catch (uploadErr) {
-        console.error('Cloudinary upload error:', uploadErr);
-        showToast(`File upload failed: ${uploadErr.message}`, 'error');
+        console.error('Batch upload error:', uploadErr);
+        if (uploadedCount > 0) {
+          setAcademicData(latestAcademicData);
+        }
+        showToast(`Upload error: ${uploadErr.message}`, 'error');
+      } finally {
         setAdminIsUploading(false);
-        return;
+        setAdminUploadProgress({ current: 0, total: 0 });
       }
     } else {
-      if (!finalLink) {
+      if (!title.trim()) {
+        showToast('Please enter a resource title.', 'error');
+        return;
+      }
+      if (!link.trim()) {
         showToast('Please enter a Google Drive link or URL.', 'error');
         return;
       }
-      const defaultSize = finalLink.includes('youtube.com') || finalLink.includes('youtu.be') ? 'Video' : 'Link';
-      if (!finalSize) finalSize = defaultSize;
-    }
 
-    const newResource = {
-      id: `res-${Date.now()}`,
-      title: title.trim(),
-      date: new Date().toISOString().split('T')[0],
-      size: finalSize,
-      downloads: 0,
-      isLink: !isDirectUpload,
-      isDirectUpload,
-      link: finalLink || '#',
-    };
+      const defaultSize = link.includes('youtube.com') || link.includes('youtu.be') ? 'Video' : 'Link';
+      const finalSize = size.trim() || defaultSize;
 
-    try {
-      const updatedData = await addResource(
-        selectedYearId,
-        selectedBranchId,
-        selectedSubjectId,
-        selectedTypeId,
-        newResource
-      );
+      const newResource = {
+        id: `res-${Date.now()}`,
+        title: title.trim(),
+        date: new Date().toISOString().split('T')[0],
+        size: finalSize,
+        downloads: 0,
+        isLink: true,
+        isDirectUpload: false,
+        link: link.trim(),
+      };
 
-      setAcademicData(updatedData);
-      setTitle('');
-      setLink('');
-      setSize('');
-      setAdminSelectedFile(null);
-      setAdminFileName('');
-      setAdminFileSize('');
-      showToast(`"${newResource.title}" added successfully!`, 'success');
-    } catch (err) {
-      console.error(err);
-      showToast('Failed to add resource to database.', 'error');
-    } finally {
-      setAdminIsUploading(false);
+      try {
+        const updatedData = await addResource(
+          selectedYearId,
+          selectedBranchId,
+          selectedSubjectId,
+          selectedTypeId,
+          newResource
+        );
+
+        setAcademicData(updatedData);
+        setTitle('');
+        setLink('');
+        setSize('');
+        showToast(`"${newResource.title}" added successfully!`, 'success');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to add resource to database.', 'error');
+      }
     }
   };
 
@@ -1250,58 +1295,111 @@ export default function Admin() {
 
                       {adminUploadMode === 'file' ? (
                         <div className="form-group">
-                          <label>Upload Document / PDF File</label>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                            <label style={{ margin: 0 }}>Upload Document Files (Multiple)</label>
+                            {adminSelectedFiles.length > 0 && (
+                              <button
+                                type="button"
+                                onClick={handleClearAllAdminFiles}
+                                style={{ background: 'none', border: 'none', color: '#f43f5e', fontSize: '0.78rem', cursor: 'pointer', fontWeight: '600' }}
+                              >
+                                Clear All ({adminSelectedFiles.length})
+                              </button>
+                            )}
+                          </div>
+
                           <div style={{
                             border: '2px dashed var(--color-border)',
                             borderRadius: '12px',
                             padding: '16px',
                             textAlign: 'center',
                             background: 'rgba(255, 255, 255, 0.02)',
-                            transition: 'border-color 0.2s ease'
+                            transition: 'border-color 0.2s ease',
+                            marginBottom: '12px'
                           }}>
-                            {adminSelectedFile ? (
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
-                                  <FileText size={20} className="text-accent" />
-                                  <div style={{ textAlign: 'left' }}>
-                                    <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-text-primary)' }}>
-                                      {adminFileName}
-                                    </div>
-                                    <div style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)' }}>
-                                      {adminFileSize}
+                            <label style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                              <Upload size={24} style={{ color: 'var(--color-accent)' }} />
+                              <span style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--color-text-primary)' }}>
+                                {adminSelectedFiles.length > 0 ? '+ Select More Files' : 'Click to select multiple PDF / document files'}
+                              </span>
+                              <span style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)' }}>
+                                Select multiple files at once (PDF, DOCX, PPTX, Images, ZIP)
+                              </span>
+                              <input
+                                type="file"
+                                multiple
+                                accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.zip"
+                                onChange={handleAdminFileChange}
+                                style={{ display: 'none' }}
+                              />
+                            </label>
+                          </div>
+
+                          {/* Selected Files Queue */}
+                          {adminSelectedFiles.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '240px', overflowY: 'auto', marginBottom: '12px' }}>
+                              {adminSelectedFiles.map((item) => (
+                                <div key={item.id} style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'space-between',
+                                  gap: '8px',
+                                  padding: '10px 12px',
+                                  borderRadius: '8px',
+                                  background: 'rgba(255, 255, 255, 0.04)',
+                                  border: '1px solid var(--color-border)'
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                                    <FileText size={18} className="text-accent" style={{ flexShrink: 0 }} />
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                      <input
+                                        type="text"
+                                        value={item.customTitle}
+                                        onChange={(e) => handleUpdateFileTitle(item.id, e.target.value)}
+                                        placeholder="Resource title for this file..."
+                                        style={{
+                                          width: '100%',
+                                          fontSize: '0.84rem',
+                                          fontWeight: '600',
+                                          padding: '2px 6px',
+                                          borderRadius: '4px',
+                                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                                          background: 'rgba(0, 0, 0, 0.2)',
+                                          color: 'var(--color-text-primary)'
+                                        }}
+                                      />
+                                      <div style={{ fontSize: '0.72rem', color: 'var(--color-text-tertiary)', marginTop: '2px' }} className="truncate">
+                                        {item.name} • {item.size}
+                                      </div>
                                     </div>
                                   </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveSingleAdminFile(item.id)}
+                                    className="btn-icon-action btn-delete"
+                                    title="Remove file"
+                                    style={{ flexShrink: 0 }}
+                                  >
+                                    <X size={14} />
+                                  </button>
                                 </div>
-                                <button
-                                  type="button"
-                                  onClick={handleAdminRemoveFile}
-                                  className="btn-icon-action btn-delete"
-                                  title="Remove file"
-                                >
-                                  <X size={14} />
-                                </button>
-                              </div>
-                            ) : (
-                              <label style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                                <Upload size={24} style={{ color: 'var(--color-accent)' }} />
-                                <span style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--color-text-primary)' }}>
-                                  Click to upload PDF / document file
-                                </span>
-                                <span style={{ fontSize: '0.78rem', color: 'var(--color-text-tertiary)' }}>
-                                  Supports PDF, DOCX, PPTX, Images, ZIP
-                                </span>
-                                <input
-                                  type="file"
-                                  accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg,.zip"
-                                  onChange={handleAdminFileChange}
-                                  style={{ display: 'none' }}
-                                />
-                              </label>
-                            )}
-                          </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <>
+                          <div className="form-group">
+                            <label>Resource Title</label>
+                            <input 
+                              type="text" 
+                              placeholder="e.g. Mid Semester PYQ 2024 / Complete Notes" 
+                              value={title}
+                              onChange={(e) => setTitle(e.target.value)}
+                              required
+                            />
+                          </div>
+
                           <div className="form-group">
                             <label>Google Drive Link or URL</label>
                             <input 
@@ -1324,32 +1422,23 @@ export default function Admin() {
                         </>
                       )}
 
-                      <div className="form-group">
-                        <label>Resource Title</label>
-                        <input 
-                          type="text" 
-                          placeholder="e.g. Mid Semester PYQ 2024 / Complete Notes" 
-                          value={title}
-                          onChange={(e) => setTitle(e.target.value)}
-                          required
-                        />
-                      </div>
-
                       <button 
                         type="submit" 
                         className="btn-primary btn-block btn-submit"
-                        disabled={adminIsUploading}
+                        disabled={adminIsUploading || (adminUploadMode === 'file' && adminSelectedFiles.length === 0)}
                         style={{ marginTop: '8px' }}
                       >
                         {adminIsUploading ? (
                           <>
                             <Loader2 size={18} className="spinner-icon animate-spin" />
-                            Uploading File to Cloud...
+                            Uploading {adminUploadProgress.current} of {adminUploadProgress.total} File(s)...
                           </>
                         ) : (
                           <>
                             <Plus size={18} />
-                            Add Resource
+                            {adminUploadMode === 'file' 
+                              ? `Upload ${adminSelectedFiles.length > 0 ? adminSelectedFiles.length + ' File(s)' : 'Files'}`
+                              : 'Add Resource Link'}
                           </>
                         )}
                       </button>
