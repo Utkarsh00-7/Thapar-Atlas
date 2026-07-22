@@ -38,7 +38,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Upload,
-  Loader2
+  Loader2,
+  GripVertical
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
 import {
@@ -47,6 +48,7 @@ import {
   deleteResource,
   resetDatabase,
   exportAsJSCode,
+  reorderResourcesInDb,
 } from '../../utils/resourceDb';
 import {
   getPendingContributions,
@@ -137,6 +139,10 @@ export default function Admin() {
   const [pyqHasSearched, setPyqHasSearched] = useState(false);
   const [pyqCurrentPage, setPyqCurrentPage] = useState(1);
   const PYQ_ITEMS_PER_PAGE = 25;
+
+  // Drag and drop reordering state
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
 
   // UI States
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -489,6 +495,67 @@ export default function Admin() {
         showToast('Failed to delete resource.', 'error');
       }
     }
+  };
+
+  // HTML5 Drag and Drop Reordering handler for Resources list
+  const handleResourceDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);
+  };
+
+  const handleResourceDragOver = (e, index) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    if (dragOverIndex !== index) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleResourceDrop = async (e, dropIndex) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      setDragOverIndex(null);
+      return;
+    }
+
+    const updatedList = [...resourcesList];
+    const [movedItem] = updatedList.splice(draggedIndex, 1);
+    updatedList.splice(dropIndex, 0, movedItem);
+
+    // Update local academicData state immediately so UI reorders instantly
+    setAcademicData((prevData) => {
+      const cloned = JSON.parse(JSON.stringify(prevData));
+      const year = cloned.find((y) => y.id === selectedYearId);
+      if (year) {
+        const branch = year.branches.find((b) => b.id === selectedBranchId);
+        if (branch) {
+          const subject = branch.subjects.find((s) => s.id === selectedSubjectId);
+          if (subject && subject.resources) {
+            subject.resources[selectedTypeId] = updatedList;
+          }
+        }
+      }
+      return cloned;
+    });
+
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+
+    // Persist new order in Firestore
+    try {
+      await reorderResourcesInDb(updatedList);
+      showToast('Resource order updated and saved!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to save new resource order.', 'error');
+    }
+  };
+
+  const handleResourceDragEnd = () => {
+    setDraggedIndex(null);
+    setDragOverIndex(null);
   };
 
   // Database reset handler
@@ -1450,7 +1517,14 @@ export default function Admin() {
               {/* Right Column: Existing Resources */}
               <div className="admin-card panel-list">
                 <div className="panel-list-header">
-                  <h2>Current Resources</h2>
+                  <div>
+                    <h2>Current Resources</h2>
+                    {resourcesList.length > 1 && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-tertiary)', display: 'block', marginTop: '2px' }}>
+                        💡 Drag items by grip handle to rearrange order
+                      </span>
+                    )}
+                  </div>
                   {currentSubject && !currentBranch.comingSoon && (
                     <span className="res-badge">
                       {currentSubject.name} — {resourceTypes.find((t) => t.id === selectedTypeId)?.label}
@@ -1465,9 +1539,32 @@ export default function Admin() {
                   </div>
                 ) : resourcesList.length > 0 ? (
                   <div className="admin-resources-list">
-                    {resourcesList.map((res) => (
-                      <div key={res.id} className="admin-resource-item">
-                        <div className="item-details">
+                    {resourcesList.map((res, index) => (
+                      <div 
+                        key={res.id} 
+                        className={`admin-resource-item ${draggedIndex === index ? 'is-dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''}`}
+                        draggable
+                        onDragStart={(e) => handleResourceDragStart(e, index)}
+                        onDragOver={(e) => handleResourceDragOver(e, index)}
+                        onDrop={(e) => handleResourceDrop(e, index)}
+                        onDragEnd={handleResourceDragEnd}
+                      >
+                        <div 
+                          className="drag-handle-grip" 
+                          title="Click & Drag to reorder file"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'grab',
+                            color: 'var(--color-text-tertiary)',
+                            padding: '4px',
+                            marginRight: '6px'
+                          }}
+                        >
+                          <GripVertical size={18} />
+                        </div>
+                        <div className="item-details" style={{ flex: 1 }}>
                           <h3>{res.title}</h3>
                           <div className="item-meta">
                             <span>

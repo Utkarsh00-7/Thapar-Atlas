@@ -101,6 +101,23 @@ export async function getAcademicData() {
       }
     });
 
+    // Sort each resource category list by order index
+    clonedData.forEach(year => {
+      year.branches.forEach(branch => {
+        if (branch.subjects) {
+          branch.subjects.forEach(subject => {
+            if (subject.resources) {
+              Object.keys(subject.resources).forEach(typeId => {
+                if (Array.isArray(subject.resources[typeId])) {
+                  subject.resources[typeId].sort((a, b) => (a.order ?? 99999) - (b.order ?? 99999));
+                }
+              });
+            }
+          });
+        }
+      });
+    });
+
     // NOW dynamically match and append all subject previous year papers (PYQs)
     try {
       const pyqs = await getPyqData();
@@ -340,5 +357,22 @@ export async function incrementResourceDownloads(id) {
   } catch (e) {
     console.error('Failed to increment resource downloads in Firestore:', e);
   }
+}
+
+/**
+ * Persists the custom dragged order of a resource list in Firestore.
+ */
+export async function reorderResourcesInDb(reorderedList) {
+  try {
+    for (let index = 0; index < reorderedList.length; index++) {
+      const item = reorderedList[index];
+      if (!item.id || item.id.endsWith('-paper') || item.id.endsWith('-answer')) continue;
+      const docRef = doc(db, RESOURCES_COLLECTION, item.id);
+      await updateDoc(docRef, { order: index });
+    }
+  } catch (e) {
+    console.error('Failed to update resource order in Firestore:', e);
+  }
+  return getAcademicData();
 }
 

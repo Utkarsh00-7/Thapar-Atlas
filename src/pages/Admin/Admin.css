@@ -352,6 +352,24 @@ button {
   transform: translateX(2px);
 }
 
+.admin-resource-item.is-dragging {
+  opacity: 0.45;
+  border: 2px dashed var(--color-accent) !important;
+  background: rgba(139, 92, 246, 0.12) !important;
+  transform: scale(0.98);
+}
+
+.admin-resource-item.drag-over {
+  border: 2px solid var(--color-accent) !important;
+  box-shadow: 0 0 14px rgba(139, 92, 246, 0.35);
+  background: rgba(139, 92, 246, 0.08) !important;
+}
+
+.drag-handle-grip:hover {
+  color: var(--color-accent) !important;
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .item-details h3 {
   font-size: 0.95rem;
   font-weight: 600;
