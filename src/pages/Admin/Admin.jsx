@@ -1354,11 +1354,17 @@ export default function Admin() {
                         value={selectedTypeId} 
                         onChange={(e) => setSelectedTypeId(e.target.value)}
                       >
-                        {resourceTypes.map((t) => (
-                          <option key={t.id} value={t.id}>
-                            {t.label}
-                          </option>
-                        ))}
+                        {resourceTypes.map((t) => {
+                          const isEnggDrawing =
+                            currentSubject?.id === 'ed-b' ||
+                            (currentSubject?.name || '').toLowerCase().includes('engineering drawing');
+                          const labelText = (t.id === 'book' && isEnggDrawing) ? 'Download Guide' : t.label;
+                          return (
+                            <option key={t.id} value={t.id}>
+                              {labelText}
+                            </option>
+                          );
+                        })}
                       </select>
                     </div>
                   )}
@@ -1587,7 +1593,12 @@ export default function Admin() {
                   </div>
                   {currentSubject && !currentBranch.comingSoon && (
                     <span className="res-badge">
-                      {currentSubject.name} — {resourceTypes.find((t) => t.id === selectedTypeId)?.label}
+                      {currentSubject.name} — {
+                        (selectedTypeId === 'book' && (
+                          currentSubject?.id === 'ed-b' ||
+                          (currentSubject?.name || '').toLowerCase().includes('engineering drawing')
+                        )) ? 'Download Guide' : resourceTypes.find((t) => t.id === selectedTypeId)?.label
+                      }
                     </span>
                   )}
                 </div>

@@ -25,7 +25,7 @@
 export const resourceTypes = [
   { id: 'syllabus', label: 'Syllabus' },
   { id: 'notes', label: 'Notes' },
-  { id: 'book', label: 'Download Guide' },
+  { id: 'book', label: 'Book / Reference' },
   { id: 'lab-manual', label: 'Lab Manual' },
   { id: 'youtube', label: 'YouTube Lectures' },
   { id: 'tutorial', label: 'Tutorial' },

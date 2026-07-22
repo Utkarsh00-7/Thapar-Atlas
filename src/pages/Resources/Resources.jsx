@@ -543,6 +543,14 @@ export default function Resources() {
           {resourceTypes.map((type) => {
             const count = selectedSubject.resources?.[type.id]?.length || 0;
             const TabIcon = typeIcons[type.id] || FileText;
+
+            // Override 'book' label for Engineering Drawing to 'Download Guide'
+            const isEnggDrawing =
+              selectedSubject?.id === 'ed-b' ||
+              (selectedSubject?.name || '').toLowerCase().includes('engineering drawing');
+
+            const tabLabel = (type.id === 'book' && isEnggDrawing) ? 'Download Guide' : type.label;
+
             return (
               <button
                 key={type.id}
@@ -553,7 +561,7 @@ export default function Resources() {
               >
                 <div className="resource-tab-label-group">
                   <TabIcon size={15} className="tab-icon" />
-                  <span className="tab-label">{type.label}</span>
+                  <span className="tab-label">{tabLabel}</span>
                 </div>
                 <div className="resource-tab-meta">
                   <span className="resource-tab-count">{count}</span>
