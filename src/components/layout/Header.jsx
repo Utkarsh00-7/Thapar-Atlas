@@ -135,8 +135,21 @@ export default function Header({ theme, toggleTheme }) {
       if (user) {
         setProfileLoading(true);
         try {
-          const prof = await getStudentProfile(user.uid);
+          const isThaparEmail = user.email && user.email.toLowerCase().endsWith('@thapar.edu');
+          let prof = await getStudentProfile(user.uid);
+
           if (prof) {
+            // Auto-verify Thapar email students if not marked verified yet
+            if (isThaparEmail && !prof.isVerified) {
+              const updated = {
+                ...prof,
+                isVerified: true,
+                verificationReason: 'Verified Thapar Institute Student (@thapar.edu)'
+              };
+              await saveStudentProfile(user.uid, user.email, updated);
+              prof = updated;
+            }
+
             setCurrentUserProfile(prof);
             setStudentProfile({
               name: prof.name || user.displayName || '',
@@ -145,29 +158,44 @@ export default function Header({ theme, toggleTheme }) {
               year: prof.year || '1',
               subgroup: prof.subgroup || '',
               phone: prof.phone || '',
-              isVerified: prof.isVerified || false,
-              verificationReason: prof.verificationReason || ''
+              isVerified: prof.isVerified || isThaparEmail || false,
+              verificationReason: prof.verificationReason || (isThaparEmail ? 'Verified Thapar Institute Student (@thapar.edu)' : '')
             });
-            if (prof.isVerified) {
-              setIdVerifyStatus({ verified: true, reason: 'ID Card details verified' });
+            if (prof.isVerified || isThaparEmail) {
+              setIdVerifyStatus({ 
+                verified: true, 
+                reason: prof.verificationReason || 'Verified Thapar Institute Student (@thapar.edu)' 
+              });
             }
           } else {
-            setCurrentUserProfile(null);
-            setStudentProfile({
+            // Create initial Firestore document for new user
+            const initialProfile = {
               name: user.displayName || '',
               rollNumber: '',
               branch: 'COE',
               year: '1',
               subgroup: '',
               phone: '',
-              isVerified: false,
-              verificationReason: ''
-            });
+              isVerified: isThaparEmail,
+              verificationReason: isThaparEmail ? 'Verified Thapar Institute Student (@thapar.edu)' : ''
+            };
+            const saved = await saveStudentProfile(user.uid, user.email, initialProfile);
+            setCurrentUserProfile(saved);
+            setStudentProfile(initialProfile);
+            if (isThaparEmail) {
+              setIdVerifyStatus({ 
+                verified: true, 
+                reason: 'Verified Thapar Institute Student (@thapar.edu)' 
+              });
+            }
           }
         } catch (err) {
-          console.error(err);
+          console.error('Profile loading error:', err);
         }
         setProfileLoading(false);
+      } else {
+        setCurrentUserProfile(null);
+        setIdVerifyStatus(null);
       }
     }
     loadProfile();
@@ -192,16 +220,26 @@ export default function Header({ theme, toggleTheme }) {
         const result = await verifyStudentIdCard(studentProfile, base64, file.type);
         setIdVerifyStatus(result);
         const extracted = result.extractedDetails || {};
-        setStudentProfile(prev => ({
-          ...prev,
-          name: extracted.name || prev.name,
-          rollNumber: extracted.rollNumber || prev.rollNumber,
-          branch: extracted.branch || prev.branch,
-          year: extracted.year || prev.year,
-          subgroup: extracted.subgroup || prev.subgroup,
+
+        const updatedProfile = {
+          ...studentProfile,
+          name: extracted.name || studentProfile.name,
+          rollNumber: extracted.rollNumber || studentProfile.rollNumber,
+          branch: extracted.branch || studentProfile.branch,
+          year: extracted.year || studentProfile.year,
+          subgroup: extracted.subgroup || studentProfile.subgroup,
           isVerified: !!result.verified,
-          verificationReason: result.reason || ''
-        }));
+          verificationReason: result.reason || 'ID Card verified by AI Registrar'
+        };
+
+        setStudentProfile(updatedProfile);
+
+        // Auto-save verified profile to Firestore immediately
+        if (result.verified && user) {
+          const savedData = await saveStudentProfile(user.uid, user.email, updatedProfile);
+          setCurrentUserProfile(savedData);
+          triggerToast('ID Card verified & profile saved permanently!', 'success');
+        }
       } catch (err) {
         console.error(err);
         setIdVerifyStatus({ verified: false, reason: 'AI Verification service error' });
