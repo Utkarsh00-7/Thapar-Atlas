@@ -22,6 +22,7 @@ import {
   Search,
   X,
   HelpCircle,
+  Sparkles,
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
 import { getAcademicData, incrementResourceDownloads } from '../../utils/resourceDb';
@@ -252,7 +253,6 @@ export default function Resources() {
   };
 
   const goToBranch = (branch) => {
-    if (branch.comingSoon) return;
     setSearchParams({ year: String(selectedYear.id), branch: branch.id });
   };
 
@@ -342,10 +342,12 @@ export default function Resources() {
       <div className="year-grid">
         {academicData.map((year) => {
           const YearIcon = yearIcons[year.icon] || Layers;
+          const isComingSoon = Number(year.id) > 1;
+
           return (
             <div
               key={year.id}
-              className="year-card"
+              className={`year-card ${isComingSoon ? 'coming-soon-year' : ''}`}
               onClick={() => goToYear(year)}
               role="button"
               tabIndex={0}
@@ -357,9 +359,78 @@ export default function Resources() {
               <div className="year-card-number">{year.id}</div>
               <div className="year-card-label">{year.label}</div>
               <div className="year-card-tagline">{year.tagline}</div>
+
+              {/* Animated Coming Soon Banner */}
+              {isComingSoon && (
+                <div className="year-coming-soon-banner">
+                  <span className="banner-beacon"></span>
+                  <Clock size={11} className="banner-clock-icon" />
+                  <span>COMING SOON</span>
+                </div>
+              )}
             </div>
           );
         })}
+      </div>
+    );
+  };
+
+  /* Step 1.5: Under Development for Year 2, 3, 4 (Anti-cheeky URL protection) */
+  const renderUnderDevelopment = () => {
+    if (!selectedYear) return null;
+
+    const isBranchDev = selectedBranch && selectedBranch.comingSoon;
+    const titleName = isBranchDev ? `${selectedBranch.name} (${selectedYear.label})` : `${selectedYear.label}`;
+    const taglineText = isBranchDev ? 'Branch Materials Curation' : selectedYear.tagline;
+
+    return (
+      <div className="under-dev-wrapper">
+        <button 
+          className="res-back-btn" 
+          onClick={isBranchDev ? () => setSearchParams({ year: String(selectedYear.id) }) : goHome}
+        >
+          <ArrowLeft size={16} />
+          {isBranchDev ? `Back to ${selectedYear.label}` : 'Back to Resources'}
+        </button>
+
+        <div className="under-dev-card glass-morphism animate-fade-in">
+          <div className="under-dev-badge-animated">
+            <span className="dev-beacon"></span>
+            <Clock size={14} />
+            <span>UNDER ACTIVE DEVELOPMENT</span>
+          </div>
+
+          <div className="under-dev-icon-circle">
+            <HardDrive size={44} className="dev-icon-float" />
+          </div>
+
+          <h2>{titleName} Archives</h2>
+          <p className="under-dev-tagline">{taglineText}</p>
+
+          <div className="under-dev-body">
+            <p>
+              We are currently gathering, curating, and verifying study materials, notes, books, and lab manuals for <strong>{titleName}</strong>.
+            </p>
+            <span className="under-dev-subtext">
+              All files and syllabus data remain preserved while our curation team organizes the branch repositories. Check back soon!
+            </span>
+
+            <div className="dev-status-pills">
+              <div className="status-pill">
+                <Sparkles size={14} style={{ color: '#fbbf24' }} />
+                <span>Gathering Verified Notes</span>
+              </div>
+              <div className="status-pill">
+                <FolderOpen size={14} style={{ color: '#38bdf8' }} />
+                <span>Organizing Branch Syllabi</span>
+              </div>
+              <div className="status-pill">
+                <BookOpen size={14} style={{ color: '#a78bfa' }} />
+                <span>Curating Reference Books</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -716,9 +787,10 @@ export default function Resources() {
 
             {/* Step-by-step content */}
             {!selectedYear && renderYears()}
-            {selectedYear && !selectedBranch && renderBranches()}
-            {selectedBranch && !selectedSubject && renderSubjects()}
-            {selectedSubject && renderResources()}
+            {selectedYear && (Number(selectedYear.id) > 1 || (selectedBranch && selectedBranch.comingSoon)) && renderUnderDevelopment()}
+            {selectedYear && Number(selectedYear.id) === 1 && !selectedBranch && renderBranches()}
+            {selectedYear && Number(selectedYear.id) === 1 && selectedBranch && !selectedBranch.comingSoon && !selectedSubject && renderSubjects()}
+            {selectedYear && Number(selectedYear.id) === 1 && selectedSubject && !selectedBranch?.comingSoon && renderResources()}
           </>
         )}
       </div>

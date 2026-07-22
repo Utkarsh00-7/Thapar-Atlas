@@ -249,6 +249,202 @@
   transform: rotate(-8deg) scale(1.1);
 }
 
+/* Animated Coming Soon Year Cards */
+.year-card.coming-soon-year {
+  position: relative;
+  border-color: rgba(245, 158, 11, 0.3);
+  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.7) 100%);
+}
+
+.year-card.coming-soon-year:hover {
+  border-color: #fbbf24;
+  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.2), 0 0 20px rgba(245, 158, 11, 0.15);
+}
+
+.year-coming-soon-banner {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+  animation: pulseAmberGlow 2.5s infinite ease-in-out;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.15);
+}
+
+.banner-beacon {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #fbbf24;
+  box-shadow: 0 0 6px #fbbf24;
+  animation: beaconPing 1.6s infinite ease-in-out;
+}
+
+.banner-clock-icon {
+  animation: clockRotate 4s infinite linear;
+}
+
+@keyframes pulseAmberGlow {
+  0%, 100% {
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.15);
+  }
+  50% {
+    border-color: rgba(245, 158, 11, 0.8);
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+  }
+}
+
+@keyframes beaconPing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.4;
+  }
+}
+
+@keyframes clockRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Under Development Screen for Year 2, 3, 4 */
+.under-dev-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.under-dev-card {
+  max-width: 680px;
+  margin: var(--space-4) auto;
+  padding: var(--space-8) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  background: radial-gradient(circle at top, rgba(245, 158, 11, 0.08) 0%, rgba(15, 23, 42, 0.85) 100%);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(245, 158, 11, 0.1);
+}
+
+.under-dev-badge-animated {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: pulseAmberGlow 2.5s infinite ease-in-out;
+}
+
+.under-dev-icon-circle {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fbbf24;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.15);
+}
+
+.dev-icon-float {
+  animation: iconFloat 3s infinite ease-in-out;
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.under-dev-card h2 {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: var(--space-1) 0 0 0;
+  color: var(--color-text-primary);
+}
+
+.under-dev-tagline {
+  font-size: 0.9rem;
+  color: var(--color-text-tertiary);
+  margin: 0;
+}
+
+.under-dev-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 520px;
+}
+
+.under-dev-body p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.under-dev-subtext {
+  font-size: 0.82rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
+.dev-status-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.under-dev-footer {
+  margin-top: var(--space-2);
+}
+
 /* ═══════════════════════════════════════════════════════════
    BRANCH / POOL CARDS
    ═══════════════════════════════════════════════════════════ */

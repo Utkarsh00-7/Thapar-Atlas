@@ -33,7 +33,10 @@ import {
   MessageSquare,
   Bug,
   Sparkles,
-  Users
+  Users,
+  Search,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { resourceTypes } from '../../utils/resourcesData';
 import {
@@ -119,8 +122,14 @@ export default function Admin() {
   const [link, setLink] = useState('');
   const [size, setSize] = useState('');
 
-  // PYQ search state
-  const [pyqSearch, setPyqSearch] = useState('');
+  // PYQ search & pagination state
+  const [pyqSearchCode, setPyqSearchCode] = useState('');
+  const [pyqSearchName, setPyqSearchName] = useState('');
+  const [pyqSearchExam, setPyqSearchExam] = useState('all');
+  const [pyqSearchPaperYear, setPyqSearchPaperYear] = useState('all');
+  const [pyqHasSearched, setPyqHasSearched] = useState(false);
+  const [pyqCurrentPage, setPyqCurrentPage] = useState(1);
+  const PYQ_ITEMS_PER_PAGE = 25;
 
   // UI States
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -468,15 +477,60 @@ export default function Admin() {
     }
   };
 
+  // Dynamic paper years for dropdown filter
+  const pyqPaperYears = useMemo(() => {
+    const years = pyqs
+      .map(p => p.paperYear)
+      .filter(y => y && /^\d{4}$/.test(String(y)));
+    return ['all', ...new Set(years)].sort((a, b) => b.localeCompare(a));
+  }, [pyqs]);
+
   // Filtered PYQs for PYQ tab search
   const filteredPyqs = useMemo(() => {
-    if (!pyqSearch.trim()) return pyqs;
-    return pyqs.filter(p => 
-      p.subjectCode.toLowerCase().includes(pyqSearch.toLowerCase()) ||
-      p.subjectName.toLowerCase().includes(pyqSearch.toLowerCase()) ||
-      p.branch.toLowerCase().includes(pyqSearch.toLowerCase())
-    );
-  }, [pyqs, pyqSearch]);
+    return pyqs.filter(paper => {
+      const matchesCode = !pyqSearchCode.trim() || 
+        (paper.subjectCode && paper.subjectCode.toLowerCase().includes(pyqSearchCode.trim().toLowerCase()));
+      
+      const matchesName = !pyqSearchName.trim() || 
+        (paper.subjectName && paper.subjectName.toLowerCase().includes(pyqSearchName.trim().toLowerCase())) ||
+        (paper.branch && paper.branch.toLowerCase().includes(pyqSearchName.trim().toLowerCase()));
+      
+      const matchesExam = pyqSearchExam === 'all' || 
+        (paper.examType && paper.examType.toUpperCase() === pyqSearchExam.toUpperCase());
+      
+      const matchesPaperYear = pyqSearchPaperYear === 'all' || 
+        (paper.paperYear && String(paper.paperYear) === String(pyqSearchPaperYear));
+
+      return matchesCode && matchesName && matchesExam && matchesPaperYear;
+    });
+  }, [pyqs, pyqSearchCode, pyqSearchName, pyqSearchExam, pyqSearchPaperYear]);
+
+  const totalPyqPages = Math.ceil(filteredPyqs.length / PYQ_ITEMS_PER_PAGE) || 1;
+
+  const paginatedPyqs = useMemo(() => {
+    const start = (pyqCurrentPage - 1) * PYQ_ITEMS_PER_PAGE;
+    return filteredPyqs.slice(start, start + PYQ_ITEMS_PER_PAGE);
+  }, [filteredPyqs, pyqCurrentPage]);
+
+  const handleSearchPyqs = (e) => {
+    if (e) e.preventDefault();
+    setPyqHasSearched(true);
+    setPyqCurrentPage(1);
+  };
+
+  const handleResetPyqSearch = () => {
+    setPyqSearchCode('');
+    setPyqSearchName('');
+    setPyqSearchExam('all');
+    setPyqSearchPaperYear('all');
+    setPyqHasSearched(false);
+    setPyqCurrentPage(1);
+  };
+
+  const handleBrowseAllPyqs = () => {
+    setPyqHasSearched(true);
+    setPyqCurrentPage(1);
+  };
 
   const handleAddAnnouncement = async (e) => {
     e.preventDefault();
@@ -1181,24 +1235,117 @@ export default function Admin() {
                   </div>
                 </div>
 
-                {/* Quick search */}
-                <div className="pyq-search-bar">
-                  <Filter size={16} className="search-icon-filter" />
-                  <input
-                    type="text"
-                    placeholder="Search archive by code, subject name, or branch..."
-                    value={pyqSearch}
-                    onChange={(e) => setPyqSearch(e.target.value)}
-                  />
-                  {pyqSearch && (
-                    <button className="btn-clear-search" onClick={() => setPyqSearch('')}>
-                      <X size={16} />
-                    </button>
-                  )}
-                </div>
+                {/* Structured PYQ Search & Filter System */}
+                <form className="admin-pyq-search-form" onSubmit={handleSearchPyqs}>
+                  <div className="admin-pyq-search-grid">
+                    <div className="pyq-search-field">
+                      <label>Course Code</label>
+                      <div className="input-with-icon">
+                        <Search size={14} className="field-icon" />
+                        <input
+                          type="text"
+                          placeholder="e.g. UCS301"
+                          value={pyqSearchCode}
+                          onChange={(e) => {
+                            setPyqSearchCode(e.target.value);
+                            setPyqHasSearched(true);
+                            setPyqCurrentPage(1);
+                          }}
+                        />
+                      </div>
+                    </div>
 
-                {filteredPyqs.length > 0 ? (
+                    <div className="pyq-search-field">
+                      <label>Subject / Branch</label>
+                      <div className="input-with-icon">
+                        <Search size={14} className="field-icon" />
+                        <input
+                          type="text"
+                          placeholder="e.g. Data Structures / COE"
+                          value={pyqSearchName}
+                          onChange={(e) => {
+                            setPyqSearchName(e.target.value);
+                            setPyqHasSearched(true);
+                            setPyqCurrentPage(1);
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="pyq-search-field">
+                      <label>Exam Type</label>
+                      <select
+                        value={pyqSearchExam}
+                        onChange={(e) => {
+                          setPyqSearchExam(e.target.value);
+                          setPyqHasSearched(true);
+                          setPyqCurrentPage(1);
+                        }}
+                      >
+                        <option value="all">All Exam Types</option>
+                        <option value="MST">MST</option>
+                        <option value="EST">EST</option>
+                        <option value="AUX">AUX</option>
+                      </select>
+                    </div>
+
+                    <div className="pyq-search-field">
+                      <label>Paper Year</label>
+                      <select
+                        value={pyqSearchPaperYear}
+                        onChange={(e) => {
+                          setPyqSearchPaperYear(e.target.value);
+                          setPyqHasSearched(true);
+                          setPyqCurrentPage(1);
+                        }}
+                      >
+                        {pyqPaperYears.map((yr) => (
+                          <option key={yr} value={yr}>
+                            {yr === 'all' ? 'All Paper Years' : yr}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="admin-pyq-search-actions">
+                    <button type="submit" className="btn-cosmic btn-glow" style={{ padding: '6px 14px', fontSize: '0.85rem' }}>
+                      <Search size={14} />
+                      Search Vault
+                    </button>
+                    <button type="button" className="btn-secondary" onClick={handleBrowseAllPyqs} style={{ padding: '6px 14px', fontSize: '0.85rem' }}>
+                      <BookOpen size={14} />
+                      Browse All ({pyqs.length})
+                    </button>
+                    {(pyqSearchCode || pyqSearchName || pyqSearchExam !== 'all' || pyqSearchPaperYear !== 'all' || pyqHasSearched) && (
+                      <button type="button" className="btn-secondary text-tertiary" onClick={handleResetPyqSearch} style={{ padding: '6px 14px', fontSize: '0.85rem' }}>
+                        <X size={14} />
+                        Reset Filters
+                      </button>
+                    )}
+                  </div>
+                </form>
+
+                {!pyqHasSearched && !pyqSearchCode && !pyqSearchName && pyqSearchExam === 'all' && pyqSearchPaperYear === 'all' ? (
+                  <div className="admin-pyq-placeholder glass-morphism">
+                    <FileCheck className="placeholder-icon" size={40} />
+                    <h3>Nava Nalanda PYQ Vault Archive</h3>
+                    <p>
+                      Enter a course code, subject name, or filter by exam type and paper year above, then click <strong>Search Vault</strong> or <strong>Browse All</strong> to view papers.
+                    </p>
+                  </div>
+                ) : filteredPyqs.length > 0 ? (
                   <div className="admin-pyq-table-container">
+                    <div className="admin-pyq-meta-bar">
+                      <span>
+                        Showing <strong>{((pyqCurrentPage - 1) * PYQ_ITEMS_PER_PAGE) + 1}–{Math.min(pyqCurrentPage * PYQ_ITEMS_PER_PAGE, filteredPyqs.length)}</strong> of <strong>{filteredPyqs.length}</strong> matching papers
+                      </span>
+                      {totalPyqPages > 1 && (
+                        <span className="page-indicator font-mono">
+                          Page {pyqCurrentPage} of {totalPyqPages}
+                        </span>
+                      )}
+                    </div>
                     <table className="admin-pyq-table">
                       <thead>
                         <tr>
@@ -1211,11 +1358,15 @@ export default function Admin() {
                         </tr>
                       </thead>
                       <tbody>
-                        {filteredPyqs.map((paper) => (
+                        {paginatedPyqs.map((paper) => (
                           <tr key={paper.id}>
                             <td className="font-mono font-bold text-accent">{paper.subjectCode}</td>
                             <td>{paper.subjectName}</td>
-                            <td className="capitalize">{paper.examType}</td>
+                            <td className="capitalize">
+                              <span className={`exam-badge ${(paper.examType || '').toLowerCase()}`}>
+                                {paper.examType}
+                              </span>
+                            </td>
                             <td>{paper.paperYear}</td>
                             <td>
                               <a 
@@ -1242,11 +1393,38 @@ export default function Admin() {
                         ))}
                       </tbody>
                     </table>
+
+                    {totalPyqPages > 1 && (
+                      <div className="admin-pyq-pagination">
+                        <button 
+                          type="button"
+                          className="btn-pagination" 
+                          disabled={pyqCurrentPage === 1}
+                          onClick={() => setPyqCurrentPage(p => Math.max(1, p - 1))}
+                        >
+                          <ChevronLeft size={16} /> Previous
+                        </button>
+                        <span className="pagination-info">
+                          Page <strong>{pyqCurrentPage}</strong> of <strong>{totalPyqPages}</strong>
+                        </span>
+                        <button 
+                          type="button"
+                          className="btn-pagination" 
+                          disabled={pyqCurrentPage === totalPyqPages}
+                          onClick={() => setPyqCurrentPage(p => Math.min(totalPyqPages, p + 1))}
+                        >
+                          Next <ChevronRight size={16} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="list-empty-state">
                     <FileCheck size={36} />
                     <p>No papers match your search queries.</p>
+                    <button type="button" className="btn-secondary" onClick={handleResetPyqSearch} style={{ marginTop: '12px' }}>
+                      Reset Filters
+                    </button>
                   </div>
                 )}
               </div>

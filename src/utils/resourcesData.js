@@ -1334,7 +1334,7 @@ export const academicData = [
         id: 'biotech',
         name: 'BioTech',
         abbr: 'BIO',
-        comingSoon: false,
+        comingSoon: true,
         subjects: [
           { id: 'biochem1', name: 'Biochemistry-I', resources: biochem1 },
           { id: 'biochem-lab', name: 'Biochemistry and Microbiology Lab', resources: biochemLab },
@@ -1354,7 +1354,7 @@ export const academicData = [
         id: 'dsai',
         name: 'DSAI',
         abbr: 'DSAI',
-        comingSoon: false,
+        comingSoon: true,
         subjects: dsaiSubjects1Year
       }
     ],
