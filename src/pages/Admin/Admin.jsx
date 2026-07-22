@@ -152,6 +152,11 @@ export default function Admin() {
   const [editResSize, setEditResSize] = useState('');
   const [editIsSaving, setEditIsSaving] = useState(false);
 
+  // Reset confirmation modal state
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetConfirmInput, setResetConfirmInput] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
+
   // UI States
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [showExportModal, setShowExportModal] = useState(false);
@@ -607,21 +612,27 @@ export default function Admin() {
     setDragOverIndex(null);
   };
 
-  // Database reset handler
-  const handleResetDatabase = async () => {
-    if (
-      window.confirm(
-        'WARNING: Are you sure you want to reset all academic data? This will wipe all newly added resources and restore the empty template.'
-      )
-    ) {
-      try {
-        const updatedData = await resetDatabase();
-        setAcademicData(updatedData);
-        showToast('Database has been reset to defaults.', 'info');
-      } catch (err) {
-        console.error(err);
-        showToast('Failed to reset database.', 'error');
-      }
+  // Database reset handlers
+  const handleOpenResetModal = () => {
+    setResetConfirmInput('');
+    setShowResetModal(true);
+  };
+
+  const handleConfirmDatabaseReset = async () => {
+    if (resetConfirmInput.trim() !== 'CONFIRM') return;
+
+    setIsResetting(true);
+    try {
+      const updatedData = await resetDatabase();
+      setAcademicData(updatedData);
+      setShowResetModal(false);
+      setResetConfirmInput('');
+      showToast('Database has been reset to template defaults.', 'info');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to reset database.', 'error');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -1256,7 +1267,7 @@ export default function Admin() {
                 <span>Add materials pool-wise. Click Export to save changes to code when finished.</span>
               </div>
               <div className="action-buttons">
-                <button className="btn-secondary text-red" onClick={handleResetDatabase} title="Reset all entries">
+                <button className="btn-secondary text-red" onClick={handleOpenResetModal} title="Reset all entries">
                   <RotateCcw size={16} />
                   Reset Database
                 </button>
@@ -2726,6 +2737,115 @@ export default function Admin() {
             <div className="modal-footer">
               <button className="btn-secondary" onClick={() => setShowExportModal(false)}>
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      {/* Reset Database Confirmation Modal */}
+      {showResetModal && (
+        <div className="modal-overlay">
+          <div className="modal-card" style={{ maxWidth: '500px' }}>
+            <div className="modal-header" style={{ borderBottom: '1px solid rgba(239, 68, 68, 0.25)' }}>
+              <h3 style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
+                <AlertTriangle size={20} />
+                Danger Zone: Reset Database
+              </h3>
+              <button 
+                className="btn-close" 
+                onClick={() => {
+                  setShowResetModal(false);
+                  setResetConfirmInput('');
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '20px' }}>
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '10px',
+                padding: '14px 16px',
+                color: '#fca5a5',
+                fontSize: '0.88rem',
+                lineHeight: '1.5'
+              }}>
+                <strong style={{ color: '#ef4444', display: 'block', marginBottom: '4px' }}>⚠️ Warning: Irreversible Action!</strong>
+                Resetting the database will <strong>permanently delete all uploaded files, PYQs, lecture notes, and custom resources</strong> added to Firestore, restoring original template defaults.
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <label style={{ fontSize: '0.86rem', fontWeight: '600', color: 'var(--color-text-primary)' }}>
+                  To confirm database reset, type <span style={{ color: '#ef4444', fontWeight: '700', letterSpacing: '0.5px' }}>CONFIRM</span> in the box below:
+                </label>
+                <input
+                  type="text"
+                  value={resetConfirmInput}
+                  onChange={(e) => setResetConfirmInput(e.target.value)}
+                  placeholder='Type "CONFIRM" here'
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    fontSize: '0.95rem',
+                    fontWeight: '700',
+                    letterSpacing: '1px',
+                    borderRadius: '8px',
+                    border: resetConfirmInput.trim() === 'CONFIRM' 
+                      ? '1.5px solid #ef4444' 
+                      : '1px solid var(--color-border)',
+                    background: 'rgba(0, 0, 0, 0.3)',
+                    color: resetConfirmInput.trim() === 'CONFIRM' ? '#ef4444' : 'var(--color-text-primary)',
+                    outline: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                  autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', padding: '16px 20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+              <button 
+                type="button"
+                className="btn-secondary" 
+                onClick={() => {
+                  setShowResetModal(false);
+                  setResetConfirmInput('');
+                }}
+                disabled={isResetting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={handleConfirmDatabaseReset}
+                disabled={resetConfirmInput.trim() !== 'CONFIRM' || isResetting}
+                style={{
+                  background: resetConfirmInput.trim() === 'CONFIRM' ? '#ef4444' : 'rgba(239, 68, 68, 0.25)',
+                  border: resetConfirmInput.trim() === 'CONFIRM' ? '1px solid #dc2626' : '1px solid transparent',
+                  color: '#fff',
+                  cursor: resetConfirmInput.trim() === 'CONFIRM' ? 'pointer' : 'not-allowed',
+                  opacity: resetConfirmInput.trim() === 'CONFIRM' ? 1 : 0.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  fontWeight: '600'
+                }}
+              >
+                {isResetting ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" />
+                    Wiping Database...
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw size={16} />
+                    Confirm & Wipe Database
+                  </>
+                )}
               </button>
             </div>
           </div>
