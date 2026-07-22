@@ -1313,7 +1313,7 @@ export const academicData = [
         id: 'csbs',
         name: 'CSBS',
         abbr: 'CSBS',
-        comingSoon: false,
+        comingSoon: true,
         subjects: [
           { id: 'bcvs1', name: 'Business Communication & Value Science - I', resources: bcvs1 },
           { id: 'bcvs2', name: 'Business Communication & Value Science - II', resources: bcvs2 },
