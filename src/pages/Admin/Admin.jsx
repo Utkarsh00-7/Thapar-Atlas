@@ -41,7 +41,8 @@ import {
   Loader2,
   GripVertical
 } from 'lucide-react';
-import { resourceTypes } from '../../utils/resourcesData';
+import { resourceTypes, academicData as templateAcademicData } from '../../utils/resourcesData';
+import { pyqData as initialPyqData } from '../../utils/pyqData';
 import {
   getAcademicData,
   addResource,
@@ -85,11 +86,11 @@ import './Admin.css';
 
 export default function Admin() {
   const { user, loading: authLoading, loginWithGoogle, logout } = useAuth();
-  const [academicData, setAcademicData] = useState([]);
+  const [academicData, setAcademicData] = useState(templateAcademicData || []);
   const [activeTab, setActiveTab] = useState('resources'); // 'resources', 'moderation', 'feedback', 'appeals'
   const [academicsSubTab, setAcademicsSubTab] = useState('resources'); // 'resources' | 'pyqs'
   const [pendingContributions, setPendingContributions] = useState([]);
-  const [pyqs, setPyqs] = useState([]);
+  const [pyqs, setPyqs] = useState(initialPyqData || []);
   const [announcements, setAnnouncements] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
   const [restrictions, setRestrictions] = useState([]);
@@ -1331,7 +1332,7 @@ export default function Admin() {
                         value={selectedBranchId} 
                         onChange={(e) => handleBranchChange(e.target.value)}
                       >
-                        {currentYear.branches.map((b) => (
+                        {(currentYear?.branches || []).map((b) => (
                           <option key={b.id} value={b.id}>
                             {b.name} {b.comingSoon ? '(Coming Soon)' : ''}
                           </option>
@@ -1348,7 +1349,7 @@ export default function Admin() {
                         value={selectedSubjectId} 
                         onChange={(e) => setSelectedSubjectId(e.target.value)}
                       >
-                        {currentBranch.subjects.map((s) => (
+                        {(currentBranch?.subjects || []).map((s) => (
                           <option key={s.id} value={s.id}>
                             {s.name}
                           </option>
