@@ -909,17 +909,6 @@ export default function Admin() {
     }
   };
 
-  if (authLoading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', background: 'transparent' }}>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <div style={{ margin: '0 auto 16px auto', width: '40px', height: '40px', border: '3px solid rgba(34,211,238,0.15)', borderTopColor: '#22d3ee', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-          <p style={{ color: '#94a3b8', fontSize: '1rem', marginTop: '12px' }}>Verifying credentials...</p>
-        </div>
-      </div>
-    );
-  }
-
   const userEmail = (user?.email || '').trim().toLowerCase();
   const isAdmin = userEmail !== '' && (
     ADMIN_EMAILS.some(e => e.trim().toLowerCase() === userEmail) ||
@@ -927,6 +916,18 @@ export default function Admin() {
   );
 
   console.log('[Admin] auth state:', { authLoading, userEmail, isAdmin, ADMIN_EMAILS, isUnlockedByPasscode });
+
+  // Show a minimal loading state only while auth is actively resolving AND we have no user yet
+  if (authLoading && !user && !isUnlockedByPasscode) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div style={{ margin: '0 auto 16px auto', width: '40px', height: '40px', border: '3px solid rgba(34,211,238,0.2)', borderTopColor: '#22d3ee', borderRadius: '50%', animation: 'adminSpin 1s linear infinite' }}></div>
+          <p style={{ color: '#94a3b8', fontSize: '1rem', marginTop: '12px' }}>Loading Admin Panel...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAdmin) {
     return (

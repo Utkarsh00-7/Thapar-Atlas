@@ -3,7 +3,13 @@
    Follows the cosmic glassmorphic theme
    ═══════════════════════════════════════════════════════════════ */
 
+@keyframes adminSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .admin-page {
+
   min-height: calc(100vh - 68px);
   padding: var(--space-8) 0 var(--space-20);
   background: transparent;
