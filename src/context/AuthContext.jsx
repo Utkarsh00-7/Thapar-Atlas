@@ -24,7 +24,15 @@ export function AuthProvider({ children }) {
 
   // Listen to auth state changes
   useEffect(() => {
+    let isMounted = true;
+    
+    // Safety fallback: Ensure loading becomes false after 2.5s maximum
+    const timer = setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 2500);
+
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!isMounted) return;
       // If user is logged in, verify email domain or admin status (case-insensitive)
       if (currentUser) {
         const email = (currentUser.email || '').toLowerCase();
@@ -45,10 +53,14 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }, (err) => {
       console.error("Auth state change error:", err);
-      setLoading(false);
+      if (isMounted) setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      unsubscribe();
+    };
   }, []);
 
   // Google sign in popup with domain validation

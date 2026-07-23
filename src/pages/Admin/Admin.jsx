@@ -884,10 +884,10 @@ export default function Admin() {
 
   if (authLoading) {
     return (
-      <div className="admin-page success-state" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '65vh' }}>
-        <div className="resources-loading-container" style={{ margin: 'auto' }}>
-          <div className="resources-loading-spinner" style={{ margin: '0 auto 16px auto' }}></div>
-          <p>Verifying credentials...</p>
+      <div className="admin-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '65vh' }}>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div className="resources-loading-spinner" style={{ margin: '0 auto 16px auto', width: '36px', height: '36px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--color-accent)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <p style={{ color: 'var(--color-text-secondary)', fontSize: '1rem' }}>Verifying credentials...</p>
         </div>
       </div>
     );
@@ -897,23 +897,27 @@ export default function Admin() {
 
   if (!isAdmin) {
     return (
-      <div className="admin-page success-state" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-        <div className="success-card glass-panel text-center" style={{ maxWidth: '480px', padding: '40px' }}>
-          <ShieldAlert className="success-icon animate-pulse" size={48} style={{ color: '#ef4444', margin: '0 auto var(--space-4) auto' }} />
-          <h1 style={{ color: '#f87171', fontSize: '1.75rem', marginBottom: '16px', fontFamily: 'var(--font-heading)' }}>Access Denied</h1>
+      <div className="admin-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '75vh', padding: '20px' }}>
+        <div className="glass-panel text-center" style={{ maxWidth: '500px', width: '100%', padding: '40px 32px', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '20px', background: 'rgba(15, 23, 42, 0.85)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 10 }}>
+          <ShieldAlert size={56} style={{ color: '#ef4444', margin: '0 auto 20px auto' }} className="animate-pulse" />
+          <h1 style={{ color: '#f87171', fontSize: '1.8rem', marginBottom: '12px', fontWeight: '700', fontFamily: 'var(--font-heading)' }}>Access Restricted</h1>
           <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6', marginBottom: '24px', fontSize: '0.95rem' }}>
-            This administrator panel is restricted to authorized credentials. You do not have permissions to view this dashboard.
+            {user ? (
+              <>Signed in as <strong style={{ color: '#fff' }}>{user.email}</strong>. This account does not have administrator permissions for Thapar Atlas.</>
+            ) : (
+              <>The Admin Panel is restricted to authorized administrators. Please sign in with your whitelisted email address.</>
+            )}
           </p>
-          <div className="button-group" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {!user ? (
-              <button className="btn-cosmic btn-glow" onClick={loginWithGoogle} style={{ width: '100%' }}>
-                <LogIn size={16} style={{ marginRight: '8px' }} />
-                Sign In with Admin Account
+              <button className="btn-cosmic btn-glow" onClick={loginWithGoogle} style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.95rem' }}>
+                <LogIn size={18} />
+                Sign In with Whitelisted Email
               </button>
             ) : (
-              <button className="btn-cosmic btn-glow" onClick={logout} style={{ width: '100%', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.3)', color: '#f87171' }}>
-                <LogOut size={16} style={{ marginRight: '8px' }} />
-                Switch Account / Sign Out
+              <button className="btn-cosmic btn-glow" onClick={logout} style={{ width: '100%', padding: '12px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.95rem' }}>
+                <LogOut size={18} />
+                Switch Account ({user.email})
               </button>
             )}
             <Link to="/" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', textDecoration: 'underline', marginTop: '8px' }}>
