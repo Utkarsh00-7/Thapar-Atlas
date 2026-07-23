@@ -48,13 +48,9 @@ export default function MobileNav({ isOpen, onClose, theme, toggleTheme }) {
       { label: 'Societies', path: '/societies', icon: Sparkles },
       { label: 'GPA Tools', path: '/gpa', icon: Calculator },
       { label: 'Campus Map', path: '/campus', icon: MapPin },
-      { label: 'Feedback', path: '/feedback', icon: MessageSquare }
+      { label: 'Feedback', path: '/feedback', icon: MessageSquare },
+      { label: 'Admin Panel', path: '/admin', icon: ShieldCheck }
     ];
-
-    const isAdmin = user && user.email && ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.toLowerCase());
-    if (isAdmin) {
-      toolsItems.push({ label: 'Admin Panel', path: '/admin', icon: ShieldCheck });
-    }
 
     return [
       {

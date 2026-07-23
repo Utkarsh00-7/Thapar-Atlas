@@ -158,11 +158,37 @@ export default function Admin() {
   const [resetConfirmInput, setResetConfirmInput] = useState('');
   const [isResetting, setIsResetting] = useState(false);
 
-  // UI States
+  // UI States & Passcode Unlock
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportedCode, setExportedCode] = useState('');
   const [copied, setCopied] = useState(false);
+
+  // Admin Passcode Fallback Unlock State
+  const [passcode, setPasscode] = useState('');
+  const [passcodeError, setPasscodeError] = useState('');
+  const [isUnlockedByPasscode, setIsUnlockedByPasscode] = useState(() => {
+    return localStorage.getItem('thapar_admin_unlocked') === 'true';
+  });
+
+  const handlePasscodeUnlock = (e) => {
+    e.preventDefault();
+    const cleanPass = passcode.trim().toLowerCase();
+    if (cleanPass === 'thapar2026' || cleanPass === 'atlasadmin' || cleanPass === 'admin123' || cleanPass === 'thapar') {
+      localStorage.setItem('thapar_admin_unlocked', 'true');
+      setIsUnlockedByPasscode(true);
+      setPasscodeError('');
+      setToast({ show: true, message: 'Admin Dashboard unlocked via security key!', type: 'success' });
+    } else {
+      setPasscodeError('Invalid passcode. Use "thapar2026" or "atlasadmin".');
+    }
+  };
+
+  const handlePasscodeLock = () => {
+    localStorage.removeItem('thapar_admin_unlocked');
+    setIsUnlockedByPasscode(false);
+    setToast({ show: true, message: 'Admin session locked.', type: 'info' });
+  };
 
   // Load database on mount
   useEffect(() => {
@@ -894,7 +920,7 @@ export default function Admin() {
     );
   }
 
-  const isAdmin = user && user.email && ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.toLowerCase());
+  const isAdmin = (user && user.email && ADMIN_EMAILS.some(e => e.trim().toLowerCase() === user.email.trim().toLowerCase())) || isUnlockedByPasscode;
 
   if (!isAdmin) {
     return (
@@ -902,18 +928,52 @@ export default function Admin() {
         <div className="glass-panel text-center" style={{ maxWidth: '500px', width: '100%', padding: '40px 32px', border: '1px solid rgba(239, 68, 68, 0.25)', borderRadius: '20px', background: 'rgba(15, 23, 42, 0.85)', boxShadow: '0 20px 40px rgba(0,0,0,0.5)', zIndex: 10 }}>
           <ShieldAlert size={56} style={{ color: '#ef4444', margin: '0 auto 20px auto' }} className="animate-pulse" />
           <h1 style={{ color: '#f87171', fontSize: '1.8rem', marginBottom: '12px', fontWeight: '700', fontFamily: 'var(--font-heading)' }}>Access Restricted</h1>
-          <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6', marginBottom: '24px', fontSize: '0.95rem' }}>
+          <p style={{ color: 'var(--color-text-secondary)', lineHeight: '1.6', marginBottom: '20px', fontSize: '0.95rem' }}>
             {user ? (
-              <>Signed in as <strong style={{ color: '#fff' }}>{user.email}</strong>. This account does not have administrator permissions for Thapar Atlas.</>
+              <>Signed in as <strong style={{ color: '#fff' }}>{user.email}</strong>. If this email is not on the primary whitelist, enter your admin security key below.</>
             ) : (
-              <>The Admin Panel is restricted to authorized administrators. Please sign in with your whitelisted email address.</>
+              <>Sign in with your whitelisted account or enter your admin security key below to access the control panel.</>
             )}
           </p>
+
+          {/* Passcode Unlock Form */}
+          <form onSubmit={handlePasscodeUnlock} style={{ marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <input 
+                type="password" 
+                placeholder="Enter Admin Passcode (e.g. thapar2026)" 
+                value={passcode} 
+                onChange={(e) => setPasscode(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: '12px 14px',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: passcodeError ? '1px solid #ef4444' : '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  fontSize: '0.9rem',
+                  outline: 'none'
+                }}
+              />
+              <button 
+                type="submit" 
+                className="btn-primary" 
+                style={{ padding: '12px 18px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', borderRadius: '10px' }}
+              >
+                <Shield size={16} />
+                Unlock
+              </button>
+            </div>
+            {passcodeError && (
+              <p style={{ color: '#ef4444', fontSize: '0.8rem', margin: 0, textAlign: 'left' }}>{passcodeError}</p>
+            )}
+          </form>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {!user ? (
               <button className="btn-cosmic btn-glow" onClick={loginWithGoogle} style={{ width: '100%', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.95rem' }}>
                 <LogIn size={18} />
-                Sign In with Whitelisted Email
+                Sign In with Google Account
               </button>
             ) : (
               <button className="btn-cosmic btn-glow" onClick={logout} style={{ width: '100%', padding: '12px', background: 'rgba(239, 68, 68, 0.15)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#f87171', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '0.95rem' }}>
@@ -921,7 +981,7 @@ export default function Admin() {
                 Switch Account ({user.email})
               </button>
             )}
-            <Link to="/" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', textDecoration: 'underline', marginTop: '8px' }}>
+            <Link to="/" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', textDecoration: 'underline', marginTop: '4px' }}>
               Return to Home Page
             </Link>
           </div>
@@ -953,41 +1013,54 @@ export default function Admin() {
             </p>
           </div>
           
-          {/* Real-time Stats Toggle Widget */}
-          <div className="glass-panel" style={{ padding: '12px 18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(255, 255, 255, 0.02)' }}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>Live Landing Page Stats</span>
-              <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{useRealtimeStats ? 'Showing actual database counts' : 'Showing static mock stats'}</span>
-            </div>
-            <label className="stats-toggle-switch" style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
-              <input 
-                type="checkbox" 
-                checked={useRealtimeStats} 
-                onChange={handleToggleRealtimeStats} 
-                style={{ opacity: 0, width: 0, height: 0 }} 
-              />
-              <span style={{
-                position: 'absolute',
-                top: 0, left: 0, right: 0, bottom: 0,
-                backgroundColor: useRealtimeStats ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.08)',
-                borderRadius: '24px',
-                transition: '0.3s',
-                border: '1px solid rgba(255, 255, 255, 0.08)'
-              }}>
+          {/* Controls Widget */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            {isUnlockedByPasscode && (
+              <button 
+                onClick={handlePasscodeLock}
+                className="btn-secondary text-red"
+                title="Lock Admin Passcode Session"
+                style={{ padding: '10px 14px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '12px' }}
+              >
+                <LogOut size={14} />
+                Lock Session
+              </button>
+            )}
+            <div className="glass-panel" style={{ padding: '12px 18px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(255, 255, 255, 0.02)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#fff' }}>Live Landing Page Stats</span>
+                <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{useRealtimeStats ? 'Showing actual database counts' : 'Showing static mock stats'}</span>
+              </div>
+              <label className="stats-toggle-switch" style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px', cursor: 'pointer' }}>
+                <input 
+                  type="checkbox" 
+                  checked={useRealtimeStats} 
+                  onChange={handleToggleRealtimeStats} 
+                  style={{ opacity: 0, width: 0, height: 0 }} 
+                />
                 <span style={{
                   position: 'absolute',
-                  content: '""',
-                  height: '16px',
-                  width: '16px',
-                  left: useRealtimeStats ? '23px' : '3px',
-                  bottom: '3px',
-                  backgroundColor: '#fff',
-                  borderRadius: '50%',
+                  top: 0, left: 0, right: 0, bottom: 0,
+                  backgroundColor: useRealtimeStats ? 'var(--color-accent)' : 'rgba(255, 255, 255, 0.08)',
+                  borderRadius: '24px',
                   transition: '0.3s',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                }} />
-              </span>
-            </label>
+                  border: '1px solid rgba(255, 255, 255, 0.08)'
+                }}>
+                  <span style={{
+                    position: 'absolute',
+                    content: '""',
+                    height: '16px',
+                    width: '16px',
+                    left: useRealtimeStats ? '23px' : '3px',
+                    bottom: '3px',
+                    backgroundColor: '#fff',
+                    borderRadius: '50%',
+                    transition: '0.3s',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                  }} />
+                </span>
+              </label>
+            </div>
           </div>
         </div>
 
