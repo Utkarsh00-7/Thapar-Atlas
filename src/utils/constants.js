@@ -94,7 +94,8 @@ export const NAV_ITEMS = [
 ];
 
 export const ADMIN_EMAILS = [
-  'umanglik_be25@thapar.edu'
+  'umanglik_be25@thapar.edu',
+  'utkarshmanglik2207@gmail.com'
 ];
 
 export const FOOTER_NAV = {

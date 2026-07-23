@@ -47,7 +47,7 @@ export default function Header({ theme, toggleTheme }) {
       { label: 'Feedback', path: '/feedback', icon: MessageSquare }
     ];
 
-    const isAdmin = user && user.email && ADMIN_EMAILS.includes(user.email);
+    const isAdmin = user && user.email && ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.toLowerCase());
     if (isAdmin) {
       toolsItems.push({ label: 'Admin Panel', path: '/admin', icon: ShieldCheck });
     }

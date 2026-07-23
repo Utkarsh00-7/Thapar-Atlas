@@ -36,7 +36,7 @@ export default function Announcements() {
     loadData();
   }, []);
 
-  const isAdmin = user && user.email && ADMIN_EMAILS.includes(user.email);
+  const isAdmin = user && user.email && ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.toLowerCase());
 
   const categories = [
     { id: 'all', label: 'All Updates' },

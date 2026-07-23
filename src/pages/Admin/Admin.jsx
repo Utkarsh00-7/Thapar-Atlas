@@ -875,7 +875,7 @@ export default function Admin() {
     );
   }
 
-  const isAdmin = user && ADMIN_EMAILS.includes(user.email);
+  const isAdmin = user && user.email && ADMIN_EMAILS.some(e => e.toLowerCase() === user.email.toLowerCase());
 
   if (!isAdmin) {
     return (
