@@ -76,7 +76,7 @@ import {
   getAppeals, 
   deleteAppeal 
 } from '../../utils/feedbackDb';
-import { getAllStudentProfiles } from '../../utils/studentDb';
+import { getAllStudentProfiles, clearAllStudents } from '../../utils/studentDb';
 import { getSystemConfig, updateSystemConfig } from '../../utils/systemConfig';
 import { db } from '../../utils/firebase';
 import { collection, getCountFromServer } from 'firebase/firestore';
@@ -865,6 +865,19 @@ export default function Admin() {
       } catch (err) {
         console.error(err);
         showToast('Failed to delete announcement.', 'error');
+      }
+    }
+  };
+
+  const handleClearAllStudents = async () => {
+    if (window.confirm('Are you sure you want to PERMANENTLY clear all registered student profiles from the database?')) {
+      try {
+        await clearAllStudents();
+        setStudents([]);
+        showToast('Student database cleared successfully!', 'info');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to clear student database.', 'error');
       }
     }
   };
@@ -2627,6 +2640,15 @@ export default function Admin() {
                     minWidth: '220px'
                   }}
                 />
+                <button 
+                  className="btn-secondary text-red" 
+                  onClick={handleClearAllStudents} 
+                  title="Wipe all student profiles"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <Trash2 size={15} />
+                  Clear Student Database
+                </button>
               </div>
             </div>
 

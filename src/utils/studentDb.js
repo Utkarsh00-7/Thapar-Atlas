@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { withTimeout } from './helpers';
 
 const PROFILES_COLLECTION = 'students';
@@ -58,5 +58,21 @@ export async function getAllStudentProfiles() {
   } catch (e) {
     console.error('Failed to get student profiles:', e);
     return [];
+  }
+}
+
+/**
+ * Permanently deletes all student profile documents from Firestore.
+ */
+export async function clearAllStudents() {
+  try {
+    const querySnapshot = await getDocs(collection(db, PROFILES_COLLECTION));
+    for (const docSnap of querySnapshot.docs) {
+      await deleteDoc(doc(db, PROFILES_COLLECTION, docSnap.id));
+    }
+    return [];
+  } catch (e) {
+    console.error('Failed to clear student profiles from Firestore:', e);
+    throw e;
   }
 }
