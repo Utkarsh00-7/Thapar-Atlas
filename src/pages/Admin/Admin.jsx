@@ -911,16 +911,22 @@ export default function Admin() {
 
   if (authLoading) {
     return (
-      <div className="admin-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '65vh' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', background: 'transparent' }}>
         <div style={{ textAlign: 'center', padding: '40px' }}>
-          <div className="resources-loading-spinner" style={{ margin: '0 auto 16px auto', width: '36px', height: '36px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: 'var(--color-accent)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-          <p style={{ color: 'var(--color-text-secondary)', fontSize: '1rem' }}>Verifying credentials...</p>
+          <div style={{ margin: '0 auto 16px auto', width: '40px', height: '40px', border: '3px solid rgba(34,211,238,0.15)', borderTopColor: '#22d3ee', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <p style={{ color: '#94a3b8', fontSize: '1rem', marginTop: '12px' }}>Verifying credentials...</p>
         </div>
       </div>
     );
   }
 
-  const isAdmin = (user && user.email && ADMIN_EMAILS.some(e => e.trim().toLowerCase() === user.email.trim().toLowerCase())) || isUnlockedByPasscode;
+  const userEmail = (user?.email || '').trim().toLowerCase();
+  const isAdmin = userEmail !== '' && (
+    ADMIN_EMAILS.some(e => e.trim().toLowerCase() === userEmail) ||
+    isUnlockedByPasscode
+  );
+
+  console.log('[Admin] auth state:', { authLoading, userEmail, isAdmin, ADMIN_EMAILS, isUnlockedByPasscode });
 
   if (!isAdmin) {
     return (

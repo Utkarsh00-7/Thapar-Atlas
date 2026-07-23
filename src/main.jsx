@@ -4,11 +4,7 @@ import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import './index.css';
 
-if (import.meta.env.PROD) {
-  console.log = () => {};
-  console.debug = () => {};
-  console.warn = () => {};
-}
+// Keep console active for debugging
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
