@@ -7,6 +7,7 @@ import {
   browserLocalPersistence
 } from 'firebase/auth';
 import { auth, googleProvider } from '../utils/firebase';
+import { ADMIN_EMAILS } from '../utils/constants';
 
 const AuthContext = createContext(null);
 
@@ -24,14 +25,17 @@ export function AuthProvider({ children }) {
   // Listen to auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // If user is logged in, verify email domain
+      // If user is logged in, verify email domain or admin status (case-insensitive)
       if (currentUser) {
-        const email = currentUser.email || '';
-        if (email.endsWith('@thapar.edu')) {
+        const email = (currentUser.email || '').toLowerCase();
+        const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
+        const isThaparEmail = email.endsWith('@thapar.edu');
+
+        if (isThaparEmail || isAdmin) {
           setUser(currentUser);
           setError(null);
         } else {
-          // If for some reason a non-Thapar user is currently logged in, clear it
+          // If for some reason an unauthorized non-Thapar user is currently logged in, clear it
           setUser(null);
           signOut(auth);
         }
@@ -53,10 +57,12 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const email = result.user.email || '';
-      
-      // Strict Thapar email domain verification
-      if (!email.endsWith('@thapar.edu')) {
+      const email = (result.user.email || '').toLowerCase();
+      const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
+      const isThaparEmail = email.endsWith('@thapar.edu');
+
+      // Strict Thapar email domain verification (allow authorized admins as well)
+      if (!isThaparEmail && !isAdmin) {
         await signOut(auth);
         setUser(null);
         const errMessage = "Thapar Atlas is restricted to official @thapar.edu emails. Please try again with your student/faculty account.";
