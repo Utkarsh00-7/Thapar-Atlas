@@ -85,9 +85,12 @@ export default function Header({ theme, toggleTheme }) {
   }, [user]);
 
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  
+
+  const isAdmin = useMemo(() => {
+    return user && user.email && ADMIN_EMAILS.some(e => e.trim().toLowerCase() === user.email.trim().toLowerCase());
+  }, [user]);
+
   // Dropdown & login error states
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -510,6 +513,31 @@ export default function Header({ theme, toggleTheme }) {
                 <Bell size={16} />
               </Link>
 
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="header__action-btn"
+                  title="Admin Dashboard"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    background: 'rgba(34, 211, 238, 0.12)',
+                    border: '1px solid rgba(34, 211, 238, 0.3)',
+                    color: 'var(--color-accent)',
+                    fontSize: '0.8rem',
+                    fontWeight: '600',
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <ShieldCheck size={14} />
+                  <span className="hide-mobile">Admin</span>
+                </Link>
+              )}
+
               {loading ? (
                 <button className="header__action-btn header__sign-in-pill header__sign-in-pill--loading" disabled type="button">
                   <Loader2 className="animate-spin" size={14} />
@@ -567,6 +595,19 @@ export default function Header({ theme, toggleTheme }) {
                         <User size={14} />
                         <span>My Profile</span>
                       </button>
+
+                      {isAdmin && (
+                        <Link 
+                          to="/admin"
+                          className="header__dropdown-item"
+                          style={{ color: 'var(--color-accent)' }}
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <ShieldCheck size={14} />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      )}
+
                       <div className="header__dropdown-divider" />
                       <button 
                         className="header__dropdown-item header__dropdown-item--logout"

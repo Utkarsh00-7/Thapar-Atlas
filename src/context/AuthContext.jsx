@@ -35,8 +35,8 @@ export function AuthProvider({ children }) {
       if (!isMounted) return;
       // If user is logged in, verify email domain or admin status (case-insensitive)
       if (currentUser) {
-        const email = (currentUser.email || '').toLowerCase();
-        const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
+        const email = (currentUser.email || '').trim().toLowerCase();
+        const isAdmin = ADMIN_EMAILS.some(a => a.trim().toLowerCase() === email);
         const isThaparEmail = email.endsWith('@thapar.edu');
 
         if (isThaparEmail || isAdmin) {
@@ -69,8 +69,8 @@ export function AuthProvider({ children }) {
     setError(null);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const email = (result.user.email || '').toLowerCase();
-      const isAdmin = ADMIN_EMAILS.some(a => a.toLowerCase() === email);
+      const email = (result.user.email || '').trim().toLowerCase();
+      const isAdmin = ADMIN_EMAILS.some(a => a.trim().toLowerCase() === email);
       const isThaparEmail = email.endsWith('@thapar.edu');
 
       // Strict Thapar email domain verification (allow authorized admins as well)
