@@ -2,6 +2,7 @@ import { db } from './firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { academicData as templateAcademicData } from './resourcesData';
 import { getPyqData, incrementPyqDownloads } from './pyqDb';
+import { withTimeout } from './helpers';
 
 const RESOURCES_COLLECTION = 'resources';
 
@@ -55,11 +56,13 @@ async function seedResourcesFromTemplate() {
 
 export async function getAcademicData() {
   try {
-    const querySnapshot = await getDocs(collection(db, RESOURCES_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, RESOURCES_COLLECTION)), 4000, null);
     const flatResources = [];
-    querySnapshot.forEach(docSnap => {
-      flatResources.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        flatResources.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
 
     // Clone nested structure template
     const clonedData = JSON.parse(JSON.stringify(templateAcademicData));

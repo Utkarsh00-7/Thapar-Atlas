@@ -1,5 +1,6 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { withTimeout } from './helpers';
 
 const CONFIG_COLLECTION = 'config';
 const SYSTEM_DOC = 'system';
@@ -10,8 +11,8 @@ const SYSTEM_DOC = 'system';
 export async function getSystemConfig() {
   try {
     const docRef = doc(db, CONFIG_COLLECTION, SYSTEM_DOC);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
+    const docSnap = await withTimeout(getDoc(docRef), 3000, null);
+    if (docSnap && docSnap.exists()) {
       return docSnap.data();
     }
   } catch (e) {

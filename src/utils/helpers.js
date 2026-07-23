@@ -129,3 +129,30 @@ export function getDownloadLink(url) {
   return url || '#';
 }
 
+/**
+ * Wraps a Promise with a timeout fallback to prevent UI hanging on slow network or Firestore.
+ * @param {Promise} promise 
+ * @param {number} ms 
+ * @param {any} fallbackValue 
+ * @returns {Promise}
+ */
+export function withTimeout(promise, ms = 4000, fallbackValue = null) {
+  return new Promise((resolve) => {
+    let timer = setTimeout(() => {
+      resolve(fallbackValue);
+    }, ms);
+
+    promise
+      .then((val) => {
+        clearTimeout(timer);
+        resolve(val);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        console.warn('Promise failed, using fallback:', err);
+        resolve(fallbackValue);
+      });
+  });
+}
+
+

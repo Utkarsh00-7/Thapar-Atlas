@@ -1,5 +1,6 @@
 import { db } from './firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { withTimeout } from './helpers';
 
 const ANNOUNCEMENTS_COLLECTION = 'announcements';
 
@@ -11,11 +12,13 @@ export async function seedAnnouncements() {
 
 export async function getAnnouncements() {
   try {
-    const querySnapshot = await getDocs(collection(db, ANNOUNCEMENTS_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, ANNOUNCEMENTS_COLLECTION)), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
 
     // Sort: Pinned/Important first, then date descending
     list.sort((a, b) => {

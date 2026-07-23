@@ -1,6 +1,7 @@
 import { db } from './firebase';
 import { collection, getDocs, doc, setDoc, deleteDoc, updateDoc, increment } from 'firebase/firestore';
 import { pyqData as initialPyqData } from './pyqData';
+import { withTimeout } from './helpers';
 
 const PYQS_COLLECTION = 'pyqs';
 
@@ -31,11 +32,13 @@ async function seedPyqTemplate() {
 
 export async function getPyqData() {
   try {
-    const querySnapshot = await getDocs(collection(db, PYQS_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, PYQS_COLLECTION)), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
 
     return list;
   } catch (e) {

@@ -1,5 +1,6 @@
 import { db } from './firebase';
 import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { withTimeout } from './helpers';
 
 const PROFILES_COLLECTION = 'students';
 
@@ -10,8 +11,8 @@ export async function getStudentProfile(uid) {
   try {
     if (!uid) return null;
     const docRef = doc(db, PROFILES_COLLECTION, uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
+    const docSnap = await withTimeout(getDoc(docRef), 3000, null);
+    if (docSnap && docSnap.exists()) {
       return docSnap.data();
     }
   } catch (e) {
@@ -46,11 +47,13 @@ export async function saveStudentProfile(uid, email, profileData) {
  */
 export async function getAllStudentProfiles() {
   try {
-    const querySnapshot = await getDocs(collection(db, PROFILES_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, PROFILES_COLLECTION)), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
     return list;
   } catch (e) {
     console.error('Failed to get student profiles:', e);
