@@ -167,32 +167,37 @@ export default function Admin() {
   useEffect(() => {
     async function loadAdminData() {
       try {
-        const academic = await getAcademicData();
-        setAcademicData(academic);
-        
-        const pending = await getPendingContributions();
-        setPendingContributions(pending);
-        
-        const pyqsList = await getPyqData();
-        setPyqs(pyqsList);
+        const [
+          academicRes,
+          pendingRes,
+          pyqsRes,
+          annRes,
+          fbRes,
+          restRes,
+          appRes,
+          studentRes,
+          configRes
+        ] = await Promise.allSettled([
+          getAcademicData(),
+          getPendingContributions(),
+          getPyqData(),
+          getAnnouncements(),
+          getFeedbacks(),
+          getRestrictions(),
+          getAppeals(),
+          getAllStudentProfiles(),
+          getSystemConfig()
+        ]);
 
-        const annList = await getAnnouncements();
-        setAnnouncements(annList);
-
-        const fbList = await getFeedbacks();
-        setFeedbacks(fbList);
-
-        const restList = await getRestrictions();
-        setRestrictions(restList);
-
-        const appList = await getAppeals();
-        setAppeals(appList);
-
-        const studentList = await getAllStudentProfiles();
-        setStudents(studentList);
-
-        const systemConfig = await getSystemConfig();
-        setUseRealtimeStats(!!systemConfig.useRealtimeStats);
+        if (academicRes.status === 'fulfilled' && academicRes.value) setAcademicData(academicRes.value);
+        if (pendingRes.status === 'fulfilled' && pendingRes.value) setPendingContributions(pendingRes.value);
+        if (pyqsRes.status === 'fulfilled' && pyqsRes.value) setPyqs(pyqsRes.value);
+        if (annRes.status === 'fulfilled' && annRes.value) setAnnouncements(annRes.value);
+        if (fbRes.status === 'fulfilled' && fbRes.value) setFeedbacks(fbRes.value);
+        if (restRes.status === 'fulfilled' && restRes.value) setRestrictions(restRes.value);
+        if (appRes.status === 'fulfilled' && appRes.value) setAppeals(appRes.value);
+        if (studentRes.status === 'fulfilled' && studentRes.value) setStudents(studentRes.value);
+        if (configRes.status === 'fulfilled' && configRes.value) setUseRealtimeStats(!!configRes.value.useRealtimeStats);
       } catch (err) {
         console.error('Failed to load admin data:', err);
       }

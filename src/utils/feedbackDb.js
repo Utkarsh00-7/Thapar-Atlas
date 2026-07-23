@@ -1,6 +1,7 @@
 import { db } from './firebase';
 import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc, orderBy, query, where } from 'firebase/firestore';
 import { checkSubmissionSpam } from './moderationAi';
+import { withTimeout } from './helpers';
 
 const FEEDBACK_COLLECTION = 'user_feedbacks';
 const RESTRICTIONS_COLLECTION = 'user_restrictions';
@@ -45,11 +46,13 @@ export async function addFeedback(feedback) {
 export async function getFeedbacks() {
   try {
     const q = query(collection(db, FEEDBACK_COLLECTION), orderBy('timestamp', 'desc'));
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await withTimeout(getDocs(q), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
     return list;
   } catch (e) {
     console.error('Failed to retrieve feedback from Firestore:', e);
@@ -194,11 +197,13 @@ export async function removeUserRestriction(email) {
  */
 export async function getRestrictions() {
   try {
-    const querySnapshot = await getDocs(collection(db, RESTRICTIONS_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, RESTRICTIONS_COLLECTION)), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
     return list;
   } catch (e) {
     console.error('Failed to retrieve restrictions:', e);
@@ -243,11 +248,13 @@ export async function submitAppeal(email, name, message) {
  */
 export async function getAppeals() {
   try {
-    const querySnapshot = await getDocs(collection(db, APPEALS_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, APPEALS_COLLECTION)), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
     return list;
   } catch (e) {
     console.error('Failed to retrieve appeals:', e);

@@ -4,6 +4,7 @@ import { addResource } from './resourceDb';
 import { addPyq } from './pyqDb';
 import { academicData } from './resourcesData';
 import { checkSubmissionSpam } from './moderationAi';
+import { withTimeout } from './helpers';
 
 const PENDING_COLLECTION = 'pending_contributions';
 
@@ -12,11 +13,13 @@ const PENDING_COLLECTION = 'pending_contributions';
  */
 export async function getPendingContributions() {
   try {
-    const querySnapshot = await getDocs(collection(db, PENDING_COLLECTION));
+    const querySnapshot = await withTimeout(getDocs(collection(db, PENDING_COLLECTION)), 4000, null);
     const list = [];
-    querySnapshot.forEach(docSnap => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    if (querySnapshot) {
+      querySnapshot.forEach(docSnap => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+    }
     return list;
   } catch (e) {
     console.error('Failed to parse pending contributions from Firestore:', e);
